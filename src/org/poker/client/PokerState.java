@@ -4,6 +4,13 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 public class PokerState {
+  
+  /**
+   * Type of move made by last player
+   */
+  private PokerMove previousMove;
+  
+  private boolean previousMoveAllIn;
 
   /**
    * Number of players in the game.
@@ -25,7 +32,7 @@ public class PokerState {
   private ImmutableList<Optional<Card>> cards;
 
   private ImmutableList<Player> playersInHand;
-
+  
   /**
    * List of hole cards belonging to each player List of bets made by each
    * player List of chips held by each player
@@ -44,7 +51,7 @@ public class PokerState {
   private ImmutableList<Pot> pots;
 
   
-  public PokerState(int numberOfPlayers, Player whoseMove,
+  public PokerState(PokerMove previousMove, boolean previousMoveAllIn, int numberOfPlayers, Player whoseMove,
       Player currentBetter, BettingRound currentRound,
       ImmutableList<Optional<Card>> cards,
       ImmutableList<Optional<Integer>> board,
@@ -53,6 +60,8 @@ public class PokerState {
       ImmutableList<Integer> playerBets, ImmutableList<Integer> playerChips,
       ImmutableList<Pot> pots) {
     super();
+    this.previousMove = previousMove;
+    this.previousMoveAllIn = previousMoveAllIn;
     this.numberOfPlayers = numberOfPlayers;
     this.whoseMove = whoseMove;
     this.currentBetter = currentBetter;
@@ -64,6 +73,68 @@ public class PokerState {
     this.playerBets = playerBets;
     this.playerChips = playerChips;
     this.pots = pots;
+  }
+  
+  public PokerMove getPreviousMove() {
+    return previousMove;
+  }
+
+  public boolean isPreviousMoveAllIn() {
+    return previousMoveAllIn;
+  }
+
+  public int getNumberOfPlayers() {
+    return numberOfPlayers;
+  }
+
+
+  public Player getWhoseMove() {
+    return whoseMove;
+  }
+
+
+  public Player getCurrentBetter() {
+    return currentBetter;
+  }
+
+
+  public BettingRound getCurrentRound() {
+    return currentRound;
+  }
+
+
+  public ImmutableList<Optional<Card>> getCards() {
+    return cards;
+  }
+
+
+  public ImmutableList<Player> getPlayersInHand() {
+    return playersInHand;
+  }
+  
+
+  public ImmutableList<ImmutableList<Optional<Integer>>> getHoleCards() {
+    return holeCards;
+  }
+
+
+  public ImmutableList<Optional<Integer>> getBoard() {
+    return board;
+  }
+
+
+  public ImmutableList<Integer> getPlayerBets() {
+    return playerBets;
+  }
+
+
+  public ImmutableList<Integer> getPlayerChips() {
+    return playerChips;
+  }
+
+
+  public ImmutableList<Pot> getPots() {
+    return pots;
   }
 
 }
