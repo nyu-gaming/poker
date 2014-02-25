@@ -13,23 +13,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
-public class PokerLogicHelper {
-
-  private static final String PREVIOUS_MOVE = "previousMove";
-  private static final String PREVIOUS_MOVE_ALL_IN = "previousMoveAllIn";
-  private static final String NUMBER_OF_PLAYERS = "numberOfPlayers";
-  private static final String WHOSE_MOVE = "whoseMove";
-  private static final String CURRENT_BETTER = "currentBetter";
-  private static final String CURRENT_ROUND = "currentRound";
-  private static final String PLAYERS_IN_HAND = "playersInHand";
-  private static final String BOARD = "board";
-  private static final String HOLE_CARDS = "holeCards";
-  private static final String PLAYER_BETS = "playerBets";
-  private static final String PLAYER_CHIPS = "playerChips";
-  private static final String POTS = "pots";
-  private static final String CHIPS = "chips";
-  private static final String CURRENT_POT_BET = "currentPotBet";
-  private static final String PLAYERS_IN_POT = "playersInPot";
+public class PokerLogicHelper extends AbstractPokerLogicBase {
 
   private static PokerLogicHelper instance;
   
@@ -50,7 +34,7 @@ public class PokerLogicHelper {
    * @param gameApiState
    * @return
    */
-  public PokerState gameApiStateToPokerState(Map<String, Object> gameApiState) {
+  PokerState gameApiStateToPokerState(Map<String, Object> gameApiState) {
 
     PokerMove previousMove = PokerMove.valueOf((String)gameApiState.get(PREVIOUS_MOVE));
     boolean previousMoveAllIn = (boolean)gameApiState.get(PREVIOUS_MOVE_ALL_IN);
@@ -62,27 +46,22 @@ public class PokerLogicHelper {
     // Get Cards
     ArrayList<Optional<Card>> cardList = new ArrayList();
     for (int i =0 ; i<52 ; i++) {
-      Card card;
+      Optional<Card> card;
       String crd = (String)gameApiState.get("C"+i);
       if (crd != null) {
         Rank rank = Rank.fromFirstLetter(crd.substring(0, crd.length() - 1));
         Suit suit = Suit.fromFirstLetterLowerCase(crd.substring(crd.length() - 1));
-        card = new Card(suit, rank);
+        card = Optional.<Card>of(new Card(suit, rank));
       }
       else {
-        card = null;
+        card = Optional.absent();
       }
-      cardList.add(Optional.fromNullable(card));
+      cardList.add(card);
     }
     ImmutableList<Optional<Card>> cards = ImmutableList.copyOf(cardList);
 
     // Get Board
-    List<Integer> boardElements = (List<Integer>) gameApiState.get(BOARD);
-    List<Optional<Integer>> boardElementsOptional = Lists.newArrayList();
-    for(Integer boardElement : boardElements) {
-      boardElementsOptional.add(Optional.fromNullable(boardElement));
-    }
-    ImmutableList<Optional<Integer>> board = ImmutableList.copyOf(boardElementsOptional);
+    ImmutableList<Integer> board = ImmutableList.copyOf((List<Integer>) gameApiState.get(BOARD));
 
     // Get Players in Hand
     List<String> playerInHandList = (List<String>) gameApiState.get(PLAYERS_IN_HAND);
@@ -94,17 +73,12 @@ public class PokerLogicHelper {
 
     // Get holeCards
     List<List<Integer>> holeCardList = (List<List<Integer>>)gameApiState.get(HOLE_CARDS);
-    ImmutableList.Builder<ImmutableList<Optional<Integer>>> holeCardListBuilder = 
+    ImmutableList.Builder<ImmutableList<Integer>> holeCardListBuilder = 
         ImmutableList.builder();
     for(List<Integer> holeCards : holeCardList) {
-      ImmutableList.Builder<Optional<Integer>> holeCardsOptionalBuilder =
-          ImmutableList.builder();
-      for(Integer holeCard : holeCards) {
-        holeCardsOptionalBuilder.add(Optional.fromNullable(holeCard));
-      }
-      holeCardListBuilder.add(holeCardsOptionalBuilder.build());
+      holeCardListBuilder.add(ImmutableList.<Integer>copyOf(holeCards));
     }
-    ImmutableList<ImmutableList<Optional<Integer>>> holeCards = holeCardListBuilder.build();
+    ImmutableList<ImmutableList<Integer>> holeCards = holeCardListBuilder.build();
 
     // Get playerBets
     List<Integer> bets = (List<Integer>)gameApiState.get(PLAYER_BETS);
@@ -140,7 +114,7 @@ public class PokerLogicHelper {
    * @param players
    * @return
    */
-  public List<String> getApiPlayerList(List<Player> players) {
+  List<String> getApiPlayerList(List<Player> players) {
     ImmutableList.Builder<String> playerListBuilder = ImmutableList.builder();
     for(Player player : players) {
       playerListBuilder.add(player.name());
@@ -148,7 +122,7 @@ public class PokerLogicHelper {
     return playerListBuilder.build();
   }
 
-  public List<Player> getPlayerListFromApi(List<String> players) {
+  List<Player> getPlayerListFromApi(List<String> players) {
     ImmutableList.Builder<Player> playerListBuilder = ImmutableList.builder();
     for(String player : players) {
       playerListBuilder.add(Player.valueOf(player));
@@ -163,7 +137,7 @@ public class PokerLogicHelper {
    * @param playerIds
    * @return
    */
-  public List<List<Integer>> getWinners(PokerState lastState, List<Integer> playerIds) {
+  List<List<Integer>> getWinners(PokerState lastState, List<Integer> playerIds) {
     
     List<Player> playersInHand = lastState.getPlayersInHand();
     List<PokerHand> bestHands = Lists.newArrayList();
@@ -172,11 +146,11 @@ public class PokerLogicHelper {
       if(playersInHand.contains(Player.values()[i])) {
         List<Card> board = Lists.newArrayList();
         List<Card> holeCards = Lists.newArrayList();
-        for(Optional<Integer> boardCard : lastState.getBoard()) {
-          board.add(lastState.getCards().get(boardCard.get()).get());
+        for(int boardCard : lastState.getBoard()) {
+          board.add(lastState.getCards().get(boardCard).get());
         }
-        for(Optional<Integer> holeCard : lastState.getHoleCards().get(i)) {
-          holeCards.add(lastState.getCards().get(holeCard.get()).get());
+        for(int holeCard : lastState.getHoleCards().get(i)) {
+          holeCards.add(lastState.getCards().get(holeCard).get());
         }
         bestHands.add(new BestHandFinder(board, holeCards).find());
       }

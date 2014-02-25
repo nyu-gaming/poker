@@ -23,29 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
-public class PokerLogic {
-
-  public static final int SMALL_BLIND = 100;
-  public static final int BIG_BLIND = 200;
-
-  private static final String[] P = {"P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8"};
-  private static final String C = "C";
-
-  private static final String PREVIOUS_MOVE = "previousMove";
-  private static final String PREVIOUS_MOVE_ALL_IN = "previousMoveAllIn";
-  private static final String NUMBER_OF_PLAYERS = "numberOfPlayers";
-  private static final String WHOSE_MOVE = "whoseMove";
-  private static final String CURRENT_BETTER = "currentBetter";
-  private static final String CURRENT_ROUND = "currentRound";
-  private static final String PLAYERS_IN_HAND = "playersInHand";
-  private static final String BOARD = "board";
-  private static final String HOLE_CARDS = "holeCards";
-  private static final String PLAYER_BETS = "playerBets";
-  private static final String PLAYER_CHIPS = "playerChips";
-  private static final String POTS = "pots";
-  private static final String CHIPS = "chips";
-  private static final String CURRENT_POT_BET = "currentPotBet";
-  private static final String PLAYERS_IN_POT = "playersInPot";
+public class PokerLogic extends AbstractPokerLogicBase {
 
   private PokerLogicHelper helper = PokerLogicHelper.getInstance();
 
@@ -123,7 +101,6 @@ public class PokerLogic {
       return doCheckMove(lastState, playerIds);
     }
     else if (previousMove == PokerMove.CALL) {
-      int existingBetAmount = lastState.getPlayerBets().get(playerIndex);
       int additionalAmount = lastState.getPlayerChips().get(playerIndex) -
           ((List<Integer>) getSetOperationVal(PLAYER_CHIPS, lastMove)).get(playerIndex);
       return doCallMove(lastState, playerIds, additionalAmount);
@@ -153,7 +130,7 @@ public class PokerLogic {
    * @param playerIds
    * @return
    */
-  private List<Operation> doEndGameMove(PokerState lastState, List<Integer> playerIds) {
+  List<Operation> doEndGameMove(PokerState lastState, List<Integer> playerIds) {
     
     List<List<Integer>> winnersForEachPot = helper.getWinners(lastState, playerIds);
     
@@ -210,7 +187,7 @@ public class PokerLogic {
    * @param playerIds
    * @return
    */
-  private List<Operation> doFoldMove(PokerState lastState, List<Integer> playerIds) {
+  List<Operation> doFoldMove(PokerState lastState, List<Integer> playerIds) {
     
     if (isNewRoundStarting(lastState, PokerMove.FOLD)) {
       return doNewRoundAfterFoldMove(lastState, playerIds);
@@ -472,7 +449,7 @@ public class PokerLogic {
    * @param betAmount
    * @return
    */
-  private List<Operation> doBetMove(PokerState lastState, List<Integer> playerIds, int betAmount) {
+  List<Operation> doBetMove(PokerState lastState, List<Integer> playerIds, int betAmount) {
     
     // In Bet move existing bet should be zero, otherwise it'll be a raise
     check(calculateLastRequiredBet(lastState) == 0, "Bet Move: Non-zero existing bet");
@@ -544,7 +521,7 @@ public class PokerLogic {
    * @param additionalAmount
    * @return
    */
-  private List<Operation> doRaiseMove(PokerState lastState, List<Integer> playerIds,
+  List<Operation> doRaiseMove(PokerState lastState, List<Integer> playerIds,
       int additionalAmount) {
     
     int playerIndex = lastState.getWhoseMove().ordinal();
@@ -977,7 +954,7 @@ public class PokerLogic {
    * @param buyInAmount
    * @return
    */
-  public List<Operation> getInitialBuyInMove(int playerId, int buyInAmount) {
+  List<Operation> getInitialBuyInMove(int playerId, int buyInAmount) {
     return ImmutableList.<Operation>of(
         new AttemptChangeTokens(
             ImmutableMap.<Integer, Integer>of(playerId, buyInAmount*(-1)),
@@ -992,7 +969,7 @@ public class PokerLogic {
    * @param startingChips
    * @return
    */
-  public List<Operation> getInitialMove(List<Integer> playerIds, Map<Integer, Integer> startingChips) {
+  List<Operation> getInitialMove(List<Integer> playerIds, Map<Integer, Integer> startingChips) {
     check(playerIds.size() >= 2 && playerIds.size() <= 9);
 
     int numberOfPlayers = playerIds.size();
@@ -1380,7 +1357,7 @@ public class PokerLogic {
   // Following utility methods have been copied from CheatLogic.java
   // in project https://github.com/yoav-zibin/cheat-game
   
-  List<Integer> getIndicesInRange(int fromInclusive, int toInclusive) {
+  private List<Integer> getIndicesInRange(int fromInclusive, int toInclusive) {
     List<Integer> keys = Lists.newArrayList();
     for (int i = fromInclusive; i <= toInclusive; i++) {
       keys.add(i);
@@ -1388,7 +1365,7 @@ public class PokerLogic {
     return keys;
   }
 
-  List<String> getCardsInRange(int fromInclusive, int toInclusive) {
+  private List<String> getCardsInRange(int fromInclusive, int toInclusive) {
     List<String> keys = Lists.newArrayList();
     for (int i = fromInclusive; i <= toInclusive; i++) {
       keys.add(C + i);
@@ -1396,7 +1373,7 @@ public class PokerLogic {
     return keys;
   }
 
-  String cardIdToString(int cardId) {
+  private String cardIdToString(int cardId) {
     checkArgument(cardId >= 0 && cardId < 52);
     int rank = (cardId / 4);
     String rankString = Rank.values()[rank].getFirstLetter();
