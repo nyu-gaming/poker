@@ -73,6 +73,10 @@ public final class GameApi {
     public static native void postMessageToParent(String message) /*-{
       $wnd.parent.postMessage(JSON.parse(message), "*");
     }-*/;
+    
+    public static native void alert(String message) /*-{
+      $wnd.alert(message);
+    }-*/;
 
     public void eventListner(String message) {
       Message messageObj = GameApiJsonHelper.getMessageObject(message);

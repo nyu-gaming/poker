@@ -15,6 +15,7 @@ import com.google.common.collect.Lists;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.AudioElement;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.media.client.Audio;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -23,7 +24,6 @@ import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CellPanel;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -31,8 +31,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
-
-import com.google.gwt.media.client.Audio;
 
 public class PokerGraphics extends Composite implements PokerPresenter.View {
   public interface PokerGraphicsUiBinder extends UiBinder<Widget, PokerGraphics> {
@@ -233,24 +231,36 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
   private List<Image> createCardImages(List<Optional<Card>> cards) {
     List<Image> images = Lists.newArrayList();
     for (Optional<Card> card : cards) {
+      boolean isBackImage = false;
       CardImage cardImage = null;
       if(card.isPresent()) {
         cardImage = CardImage.Factory.getCardImage(card.get());
       }
       else {
         cardImage = CardImage.Factory.getBackOfCardImage();
+        isBackImage = true;
       }
       Image newImage = new Image(cardImageSupplier.getResource(cardImage));
-      newImage.setStyleName("cardImage");
+      if (isBackImage) {
+        newImage.setStyleName("backCardImage");
+      }
+      else {
+        newImage.setStyleName("cardImage");
+      }
       images.add(newImage);
     }
     return images;
   }
   
   private void placeCards(HorizontalPanel panel, List<Image> images) {
-    panel.clear();
+    boolean existingCards = panel.getWidgetCount() > 0;
+    boolean isCommunityCards = images.size() == 5;
+    if (!isCommunityCards) {
+      panel.clear();
+    }
+    
     for (int i = 0; i < images.size(); i++) {
-      FlowPanel imageContainer = new FlowPanel();
+      VerticalPanel imageContainer = new VerticalPanel();
       if (images.size() == 2 && i == 0) {
         imageContainer.setStyleName("imgShortCardContainer");
       }
@@ -258,10 +268,41 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
         imageContainer.setStyleName("imgCardContainer");
       }
       imageContainer.add(images.get(i));
+      if (isCommunityCards && existingCards) {
+        animateCard(panel, i, imageContainer);
+      }
+      else {
+        panel.add(imageContainer);
+      }
+    }
+  }
+  
+  private void animateCard(HorizontalPanel panel, int i, VerticalPanel imageContainer) {
+    if (i < panel.getWidgetCount()) {
+      VerticalPanel oldCardContainer = (VerticalPanel)panel.getWidget(i);
+      Image oldImage = (Image)oldCardContainer.getWidget(0);
+      Image newImage = (Image)imageContainer.getWidget(0);
+      if (cardFlips(oldImage, newImage)) { 
+        CardTurnAnimation animation = new CardTurnAnimation(oldImage, newImage, oldCardContainer);
+        animation.run(1500);
+      }
+      else {
+        // do nothing
+      }
+    }
+    else {
       panel.add(imageContainer);
     }
   }
   
+  private boolean cardFlips(Image oldImage, Image newImage) {
+    return ("backCardImage".equals(oldImage.getStyleName()) &&
+        !"backCardImage".equals(newImage.getStyleName())) ||
+    (!"backCardImage".equals(oldImage.getStyleName()) &&
+        "backCardImage".equals(newImage.getStyleName()));
+  }
+
+
   @Override
   public void setPresenter(PokerPresenter pokerPresenter) {
     this.presenter = pokerPresenter;
