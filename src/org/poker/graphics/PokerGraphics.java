@@ -13,6 +13,7 @@ import org.poker.client.Pot;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.gwt.core.shared.GWT;
+import com.google.gwt.dom.client.AudioElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -30,6 +31,8 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+
+import com.google.gwt.media.client.Audio;
 
 public class PokerGraphics extends Composite implements PokerPresenter.View {
   public interface PokerGraphicsUiBinder extends UiBinder<Widget, PokerGraphics> {
@@ -120,6 +123,13 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
   @UiField
   Button btnAllIn;
   
+  private Audio betSound;
+  private Audio callSound;
+  private Audio foldSound;
+  private Audio raiseSound;
+  private Audio checkSound;
+  private Audio wrongMoveSound;
+  
   private PokerPresenter presenter;
   private final CardImageSupplier cardImageSupplier;
   
@@ -131,6 +141,7 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
   
   public PokerGraphics() {
     CardImages cardImages = GWT.create(CardImages.class);
+    GameSounds gameSounds = GWT.create(GameSounds.class);
     this.cardImageSupplier = new CardImageSupplier(cardImages);
     PokerGraphicsUiBinder uiBinder = GWT.create(PokerGraphicsUiBinder.class);
     initWidget(uiBinder.createAndBindUi(this));
@@ -143,7 +154,80 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
       panel.setStyleName("playerInfoPanel");
     }
     potInfoPanel.add(new Label("Waiting for all players to buy-in..."));
-    
+   
+    if (Audio.isSupported()) {
+    	betSound = Audio.createIfSupported();
+        betSound.addSource(gameSounds.betMp3().getSafeUri()
+                        .asString(), AudioElement.TYPE_MP3);
+        betSound.addSource(gameSounds.betWav().getSafeUri()
+                        .asString(), AudioElement.TYPE_WAV);
+        
+        callSound = Audio.createIfSupported();
+        callSound.addSource(gameSounds.callMp3().getSafeUri()
+                        .asString(), AudioElement.TYPE_MP3);
+        callSound.addSource(gameSounds.callWav().getSafeUri()
+                        .asString(), AudioElement.TYPE_WAV);
+        
+        foldSound = Audio.createIfSupported();
+        foldSound.addSource(gameSounds.foldMp3().getSafeUri()
+                        .asString(), AudioElement.TYPE_MP3);
+        foldSound.addSource(gameSounds.foldWav().getSafeUri()
+                        .asString(), AudioElement.TYPE_WAV);
+        
+        raiseSound = Audio.createIfSupported();
+        raiseSound.addSource(gameSounds.raiseMp3().getSafeUri()
+                        .asString(), AudioElement.TYPE_MP3);
+        raiseSound.addSource(gameSounds.raiseWav().getSafeUri()
+                        .asString(), AudioElement.TYPE_WAV);
+        
+        checkSound = Audio.createIfSupported();
+        checkSound.addSource(gameSounds.checkMp3().getSafeUri()
+                        .asString(), AudioElement.TYPE_MP3);
+        checkSound.addSource(gameSounds.checkWav().getSafeUri()
+                        .asString(), AudioElement.TYPE_WAV);
+        
+        wrongMoveSound = Audio.createIfSupported();
+        wrongMoveSound.addSource(gameSounds.wrongMoveMp3().getSafeUri()
+                        .asString(), AudioElement.TYPE_MP3);
+        wrongMoveSound.addSource(gameSounds.wrongMoveWav().getSafeUri()
+                        .asString(), AudioElement.TYPE_WAV);
+    }
+  }
+  
+  
+  public void playBetSound() {
+          if (betSound != null)
+                  betSound.play();
+  }
+  
+  
+  public void playRaiseSound() {
+          if (betSound != null)
+                  betSound.play();
+  }
+  
+  
+  public void playCallSound() {
+          if (betSound != null)
+                  betSound.play();
+  }
+  
+  
+  public void playFoldSound() {
+          if (betSound != null)
+                  betSound.play();
+  }
+  
+  
+  public void playCheckSound() {
+          if (betSound != null)
+                  betSound.play();
+  }
+  
+  
+  public void playWrongMoveSound() {
+          if (betSound != null)
+                  betSound.play();
   }
   
   private List<Image> createCardImages(List<Optional<Card>> cards) {
@@ -349,6 +433,7 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
   @UiHandler("btnFold")
   void onClickFoldBtn(ClickEvent e) {
     //disableClicks();
+	playFoldSound();
     presenter.moveMade(PokerMove.FOLD, 0);
   }
   
@@ -356,9 +441,11 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
   void onClickCheckBtn(ClickEvent e) {
     //disableClicks();
     if (currentBet - myCurrentBet != 0) {
+      playWrongMoveSound();
       Window.alert("Current bet is not 0");
       return;
     }
+    playCheckSound();
     presenter.moveMade(PokerMove.CHECK, 0);
   }
   
@@ -367,13 +454,16 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
     //disableClicks();
     int callAmount = currentBet - myCurrentBet;
     if (myChips < callAmount) {
+      playWrongMoveSound();
       Window.alert("Insufficient chips to Call");
       return;
     }
     if (callAmount == 0) {
+      playWrongMoveSound();
       Window.alert("Can't call 0 amount");
       return;
     }
+    playCallSound();
     presenter.moveMade(PokerMove.CALL, callAmount);
   }
   
@@ -385,26 +475,32 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
       amount = Integer.parseInt(txtAmount.getText());
     }
     catch (NumberFormatException ex) {
+      playWrongMoveSound();
       Window.alert("Please enter a valid number");
       return;
     }
     
     if (amount > myChips) {
+      playWrongMoveSound();
       Window.alert("Insufficient chips");
       return;
     }
     
     if (currentBet == 0) {
       if (amount < PokerLogic.BIG_BLIND) {
+        playWrongMoveSound();
         Window.alert("Bet cannot be less than big blind (" + PokerLogic.BIG_BLIND + ")");
         return;
       }
+      playBetSound();
       presenter.moveMade(PokerMove.BET, amount);
     }
     else if (myCurrentBet + amount >= 2 * currentBet) {
+      playRaiseSound();
       presenter.moveMade(PokerMove.RAISE, amount);
     }
     else {
+      playWrongMoveSound();
       Window.alert("Invalid Raise amount");
     }
   }
@@ -413,12 +509,15 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
   void onClickAllInBtn(ClickEvent e) {
     int amount = myChips;
     if (currentBet == 0) {
+      playBetSound();
       presenter.moveMade(PokerMove.BET, amount);
     }
     else if (amount + myCurrentBet <= currentBet) {
+      playCallSound();
       presenter.moveMade(PokerMove.CALL, amount);
     }
     else {
+      playRaiseSound();
       presenter.moveMade(PokerMove.RAISE, amount);
     }
   }
