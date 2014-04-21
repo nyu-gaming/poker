@@ -21,7 +21,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbsolutePanel;
-import com.google.gwt.user.client.ui.Button;
+//import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CellPanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -31,6 +31,9 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.googlecode.mgwt.ui.client.MGWT;
+import com.googlecode.mgwt.ui.client.MGWTSettings;
+import com.googlecode.mgwt.ui.client.widget.Button;
 
 public class PokerGraphics extends Composite implements PokerPresenter.View {
   public interface PokerGraphicsUiBinder extends UiBinder<Widget, PokerGraphics> {
@@ -143,6 +146,7 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
     this.cardImageSupplier = new CardImageSupplier(cardImages);
     PokerGraphicsUiBinder uiBinder = GWT.create(PokerGraphicsUiBinder.class);
     initWidget(uiBinder.createAndBindUi(this));
+    MGWT.applySettings(MGWTSettings.getAppSetting());
     holeCardPanelArr = new HorizontalPanel[] {holeCards1, holeCards2, holeCards3,
         holeCards4, holeCards5, holeCards6, holeCards7, holeCards8, holeCards9};
     infoPanelArr = new CellPanel[] {info1, info2, info3,
@@ -471,7 +475,7 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
     disableButtons();
   }
 
-  @UiHandler("btnFold")
+  /*@UiHandler("btnFold")
   void onClickFoldBtn(ClickEvent e) {
     //disableClicks();
 	playFoldSound();
@@ -561,24 +565,24 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
       playRaiseSound();
       presenter.moveMade(PokerMove.RAISE, amount);
     }
-  }
+  }*/
   
   @Override
   public void makeYourMove() {
-    btnFold.setEnabled(true);
-    btnCheck.setEnabled(currentBet - myCurrentBet == 0);
-    btnCall.setEnabled(myChips >= currentBet - myCurrentBet);
-    btnBet.setEnabled(true);
+    btnFold.setDisabled(false);
+    btnCheck.setDisabled(!(currentBet - myCurrentBet == 0));
+    btnCall.setDisabled(!(myChips >= currentBet - myCurrentBet));
+    btnBet.setDisabled(false);
     txtAmount.setEnabled(true);
-    btnAllIn.setEnabled(true);
+    btnAllIn.setDisabled(false);
   }
   
   private void disableButtons() {
-    btnFold.setEnabled(false);
-    btnCheck.setEnabled(false);
-    btnCall.setEnabled(false);
-    btnBet.setEnabled(false);
+    btnFold.setDisabled(true);
+    btnCheck.setDisabled(true);
+    btnCall.setDisabled(true);
+    btnBet.setDisabled(true);
     txtAmount.setEnabled(false);
-    btnAllIn.setEnabled(false); 
+    btnAllIn.setDisabled(true); 
   }  
 }

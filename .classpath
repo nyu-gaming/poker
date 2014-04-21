@@ -158,5 +158,6 @@
 			<attribute name="javadoc_location" value="file:/home/rohan/.eclipse/org.eclipse.platform_3.8_155965261/plugins/com.google.appengine.eclipse.sdkbundle_1.9.0/appengine-java-sdk-1.9.0/docs/javadoc/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/mgwt-1.2.0-20131207.062839-26.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
