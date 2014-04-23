@@ -20,20 +20,22 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.AbsolutePanel;
+//import com.google.gwt.user.client.ui.AbsolutePanel;
 //import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CellPanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.HorizontalPanel;
+//import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
+import com.googlecode.mgwt.ui.client.widget.LayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.VerticalPanel;
+//import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.googlecode.mgwt.ui.client.MGWT;
 import com.googlecode.mgwt.ui.client.MGWTSettings;
 import com.googlecode.mgwt.ui.client.widget.Button;
+import com.googlecode.mgwt.ui.client.widget.RoundPanel;
 
 public class PokerGraphics extends Composite implements PokerPresenter.View {
   public interface PokerGraphicsUiBinder extends UiBinder<Widget, PokerGraphics> {
@@ -44,17 +46,17 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
   private static final int MAX_PLAYERS = 9;
   
   @UiField
-  AbsolutePanel pokerTable;
+  RoundPanel pokerTable;
   
   @UiField
-  VerticalPanel seat1;
+  LayoutPanel seat1;
   @UiField
-  HorizontalPanel seat2;
+  LayoutPanel seat2;
   @UiField
-  HorizontalPanel seat3;
+  LayoutPanel seat3;
   @UiField
-  VerticalPanel seat4;
-  @UiField
+  LayoutPanel seat4;
+/*  @UiField
   VerticalPanel seat5;
   @UiField
   VerticalPanel seat6;
@@ -63,17 +65,17 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
   @UiField
   HorizontalPanel seat8;
   @UiField
-  VerticalPanel seat9;
+  VerticalPanel seat9;*/
   
   @UiField
-  HorizontalPanel holeCards1;
+  RoundPanel holeCards1;
   @UiField
-  HorizontalPanel holeCards2;
+  RoundPanel holeCards2;
   @UiField
-  HorizontalPanel holeCards3;
+  RoundPanel holeCards3;
   @UiField
-  HorizontalPanel holeCards4;
-  @UiField
+  RoundPanel holeCards4;
+  /*@UiField
   HorizontalPanel holeCards5;
   @UiField
   HorizontalPanel holeCards6;
@@ -82,17 +84,17 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
   @UiField
   HorizontalPanel holeCards8;
   @UiField
-  HorizontalPanel holeCards9;
+  HorizontalPanel holeCards9;*/
   
   @UiField
-  VerticalPanel info1;
+  RoundPanel info1;
   @UiField
-  VerticalPanel info2;
+  RoundPanel info2;
   @UiField
-  VerticalPanel info3;
+  RoundPanel info3;
   @UiField
-  VerticalPanel info4;
-  @UiField
+  RoundPanel info4;
+  /*@UiField
   VerticalPanel info5;
   @UiField
   VerticalPanel info6;
@@ -101,15 +103,15 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
   @UiField
   VerticalPanel info8;
   @UiField
-  VerticalPanel info9;
+  VerticalPanel info9;*/
   
-  HorizontalPanel[] holeCardPanelArr;
-  CellPanel[] infoPanelArr;
+  RoundPanel[] holeCardPanelArr;
+  RoundPanel[] infoPanelArr;
   
   @UiField
-  HorizontalPanel communityCards;
+  RoundPanel communityCards;
   @UiField
-  VerticalPanel potInfoPanel;
+  RoundPanel potInfoPanel;
   
   @UiField
   Button btnFold;
@@ -147,12 +149,17 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
     PokerGraphicsUiBinder uiBinder = GWT.create(PokerGraphicsUiBinder.class);
     initWidget(uiBinder.createAndBindUi(this));
     MGWT.applySettings(MGWTSettings.getAppSetting());
-    holeCardPanelArr = new HorizontalPanel[] {holeCards1, holeCards2, holeCards3,
+    holeCardPanelArr = new RoundPanel[] {holeCards1, holeCards2, holeCards3,
+            holeCards4};
+        infoPanelArr = new RoundPanel[] {info1, info2, info3,
+            info4};
+        
+    /*holeCardPanelArr = new HorizontalPanel[] {holeCards1, holeCards2, holeCards3,
         holeCards4, holeCards5, holeCards6, holeCards7, holeCards8, holeCards9};
     infoPanelArr = new CellPanel[] {info1, info2, info3,
-        info4, info5, info6, info7, info8, info9};
+        info4, info5, info6, info7, info8, info9};*/
     pokerTable.setStyleName("pokerTablePanel");
-    for (CellPanel panel : infoPanelArr) {
+    for (RoundPanel panel : infoPanelArr) {
       panel.setStyleName("playerInfoPanel");
     }
     potInfoPanel.add(new Label("Waiting for all players to buy-in..."));
@@ -256,7 +263,7 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
     return images;
   }
   
-  private void placeCards(HorizontalPanel panel, List<Image> images) {
+  private void placeCards(RoundPanel panel, List<Image> images) {
     boolean existingCards = panel.getWidgetCount() > 0;
     boolean isCommunityCards = images.size() == 5;
     if (!isCommunityCards) {
@@ -264,7 +271,7 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
     }
     
     for (int i = 0; i < images.size(); i++) {
-      VerticalPanel imageContainer = new VerticalPanel();
+      RoundPanel imageContainer = new RoundPanel();
       if (images.size() == 2 && i == 0) {
         imageContainer.setStyleName("imgShortCardContainer");
       }
@@ -281,9 +288,9 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
     }
   }
   
-  private void animateCard(HorizontalPanel panel, int i, VerticalPanel imageContainer) {
+  private void animateCard(RoundPanel panel, int i, RoundPanel imageContainer) {
     if (i < panel.getWidgetCount()) {
-      VerticalPanel oldCardContainer = (VerticalPanel)panel.getWidget(i);
+      RoundPanel oldCardContainer = (RoundPanel)panel.getWidget(i);
       Image oldImage = (Image)oldCardContainer.getWidget(0);
       Image newImage = (Image)imageContainer.getWidget(0);
       if (cardFlips(oldImage, newImage)) { 

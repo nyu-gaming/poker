@@ -5,7 +5,7 @@ import com.google.gwt.animation.client.Animation;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.googlecode.mgwt.ui.client.widget.RoundPanel;
 
 public class CardTurnAnimation extends Animation {
   
@@ -16,16 +16,16 @@ public class CardTurnAnimation extends Animation {
   private int startWidth = 55;
   private int startHeight = 75;
   
-  private VerticalPanel imagePanel;
+  private RoundPanel imagePanel;
   
   public CardTurnAnimation(Image oldCard, Image newCard,
-      VerticalPanel panel) {
+      RoundPanel oldCardContainer) {
     this.oldCard = oldCard;
     this.newCard = newCard;
     transitCard = oldCard == null ? newCard : oldCard;
     //startWidth = oldCard != null ? oldCard.getWidth() : 0;
     //startHeight = newCard.getHeight();
-    imagePanel = panel;
+    imagePanel = oldCardContainer;
     //ContainerConnector.alert("new animation: " + startWidth + ", " + startHeight);
   }
 
@@ -46,7 +46,7 @@ public class CardTurnAnimation extends Animation {
       }
       transitCard.setPixelSize(width, startHeight);
       imagePanel.add(transitCard);
-      imagePanel.setCellHorizontalAlignment(transitCard, HasHorizontalAlignment.ALIGN_CENTER);
+      //imagePanel.setCellHorizontalAlignment(transitCard, HasHorizontalAlignment.ALIGN_CENTER);
     }
     else {
       width =(int)(startWidth * progress);
@@ -55,7 +55,7 @@ public class CardTurnAnimation extends Animation {
       }
       transitCard.setPixelSize(width, startHeight);
       imagePanel.add(transitCard);
-      imagePanel.setCellHorizontalAlignment(transitCard, HasHorizontalAlignment.ALIGN_CENTER);
+      //imagePanel.setCellHorizontalAlignment(transitCard, HasHorizontalAlignment.ALIGN_CENTER);
     }
     
   }
