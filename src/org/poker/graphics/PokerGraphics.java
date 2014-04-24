@@ -2,7 +2,6 @@ package org.poker.graphics;
 
 import java.util.List;
 
-import org.game_api.GameApi.ContainerConnector;
 import org.poker.client.BettingRound;
 import org.poker.client.Card;
 import org.poker.client.Player;
@@ -15,32 +14,28 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.AudioElement;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.media.client.Audio;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
-//import com.google.gwt.user.client.ui.AbsolutePanel;
-//import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.CellPanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-//import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Widget;
 import com.googlecode.mgwt.dom.client.event.tap.TapEvent;
 import com.googlecode.mgwt.dom.client.event.tap.TapHandler;
-import com.googlecode.mgwt.ui.client.widget.LayoutPanel;
-import com.google.gwt.user.client.ui.TextBox;
-//import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
 import com.googlecode.mgwt.ui.client.MGWT;
 import com.googlecode.mgwt.ui.client.MGWTSettings;
 import com.googlecode.mgwt.ui.client.widget.Button;
+import com.googlecode.mgwt.ui.client.widget.LayoutPanel;
 import com.googlecode.mgwt.ui.client.widget.RoundPanel;
+//import com.google.gwt.user.client.ui.AbsolutePanel;
+//import com.google.gwt.user.client.ui.Button;
+//import com.google.gwt.user.client.ui.HorizontalPanel;
+//import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class PokerGraphics extends Composite implements PokerPresenter.View {
   public interface PokerGraphicsUiBinder extends UiBinder<Widget, PokerGraphics> {
