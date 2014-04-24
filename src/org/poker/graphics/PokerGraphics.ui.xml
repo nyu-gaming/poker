@@ -4,7 +4,7 @@
   xmlns:m="urn:import:com.googlecode.mgwt.ui.client.widget">
   
   <m:LayoutPanel>
-    <m:RoundPanel ui:field="pokerTable">
+    <m:LayoutPanel ui:field="pokerTable">
 	  
       <!--  g:at left='320' top='150'-->
         <m:LayoutPanel>
@@ -16,7 +16,7 @@
 	    <!-- g:at left='680' top='30'-->
 	      <m:LayoutPanel height="100px" ui:field="seat1">
 	        <m:RoundPanel height="75px" ui:field="holeCards1" />
-          <m:RoundPanel ui:field="info1" />
+          	<m:RoundPanel ui:field="info1" />
 	      </m:LayoutPanel>
 	    <!-- /g:at-->
 	    
@@ -77,9 +77,9 @@
 	      </g:VerticalPanel>
 	    </g:at-->
 	  
-	  </m:RoundPanel>
+	  </m:LayoutPanel>
 	  
-	  <g:HorizontalPanel>
+	  <g:HorizontalPanel ui:field="btnPanel">
 	  
 	    <m:Button text="Fold" ui:field="btnFold"/>
       <m:Button text="Check" ui:field="btnCheck"/>

@@ -6,8 +6,9 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.TextBox;
+import com.googlecode.mgwt.ui.client.dialog.PopinDialog;
 
-public class PopupEnterValue extends DialogBox {
+public class PopupEnterValue extends PopinDialog {
   public interface ValueEntered {
     void setValue(int value);
   }
@@ -16,9 +17,10 @@ public class PopupEnterValue extends DialogBox {
   Button btnEnter;
   
   public PopupEnterValue(String text, final ValueEntered valueEntered) {
-    super(false, true);
-    setText(text);
-    txtValue = new TextBox();
+    //super(false, true);
+    //setText(text);
+    
+	txtValue = new TextBox();
     btnEnter = new Button("Buy-in");
     btnEnter.addClickHandler(new ClickHandler() {
       @Override
@@ -30,7 +32,7 @@ public class PopupEnterValue extends DialogBox {
     HorizontalPanel panel = new HorizontalPanel();
     panel.add(txtValue);
     panel.add(btnEnter);
-    setWidget(panel);
+    add(panel);
   }
   
   @Override

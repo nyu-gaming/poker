@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.game_api.GameApi.Container;
+import org.game_api.GameApi.ContainerConnector;
 import org.game_api.GameApi.UpdateUI;
 
 import com.google.common.base.Optional;
@@ -95,6 +96,9 @@ public class PokerPresenter {
   
   /* Updates the presenter and view with the state in updateUI   */
   public void updateUI(UpdateUI updateUI) {
+	  
+	//ContainerConnector.alert("got update ui");  
+	  
     playerIdList = updateUI.getPlayerIds();
     int numOfPlayers = playerIdList.size();
     String playerId = updateUI.getYourPlayerId();

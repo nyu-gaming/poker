@@ -2,6 +2,7 @@ package org.poker.graphics;
 
 import java.util.List;
 
+import org.game_api.GameApi.ContainerConnector;
 import org.poker.client.BettingRound;
 import org.poker.client.Card;
 import org.poker.client.Player;
@@ -15,6 +16,7 @@ import com.google.common.collect.Lists;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.AudioElement;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.media.client.Audio;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -25,9 +27,12 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.CellPanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 //import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
+import com.googlecode.mgwt.dom.client.event.tap.TapEvent;
+import com.googlecode.mgwt.dom.client.event.tap.TapHandler;
 import com.googlecode.mgwt.ui.client.widget.LayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 //import com.google.gwt.user.client.ui.VerticalPanel;
@@ -43,10 +48,10 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
   
   private static final boolean AUTO_BUY_IN = false;
   private static final int AUTO_BUY_IN_VALUE = 10000;
-  private static final int MAX_PLAYERS = 9;
+  private static final int MAX_PLAYERS = 4;
   
   @UiField
-  RoundPanel pokerTable;
+  LayoutPanel pokerTable;
   
   @UiField
   LayoutPanel seat1;
@@ -114,6 +119,9 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
   RoundPanel potInfoPanel;
   
   @UiField
+  HorizontalPanel btnPanel;
+  
+  @UiField
   Button btnFold;
   @UiField
   Button btnCheck;
@@ -149,21 +157,33 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
     PokerGraphicsUiBinder uiBinder = GWT.create(PokerGraphicsUiBinder.class);
     initWidget(uiBinder.createAndBindUi(this));
     MGWT.applySettings(MGWTSettings.getAppSetting());
+    
     holeCardPanelArr = new RoundPanel[] {holeCards1, holeCards2, holeCards3,
             holeCards4};
-        infoPanelArr = new RoundPanel[] {info1, info2, info3,
+    infoPanelArr = new RoundPanel[] {info1, info2, info3,
             info4};
-        
+    
+    for (int i = 0; i < holeCardPanelArr.length; i++) {
+      holeCardPanelArr[i].setStylePrimaryName("holeCardPanel");
+      holeCardPanelArr[i].setStyleDependentName("panel" + (i+1), true);
+      ((LayoutPanel)holeCardPanelArr[i].getParent().getParent()).setStyleName("playerSeat" + (i+1));
+    }
+    
+    btnPanel.setStyleName("btnPanel");
     /*holeCardPanelArr = new HorizontalPanel[] {holeCards1, holeCards2, holeCards3,
         holeCards4, holeCards5, holeCards6, holeCards7, holeCards8, holeCards9};
     infoPanelArr = new CellPanel[] {info1, info2, info3,
         info4, info5, info6, info7, info8, info9};*/
     pokerTable.setStyleName("pokerTablePanel");
+    potInfoPanel.setStyleName("potInfoPanel");
+    ((LayoutPanel)potInfoPanel.getParent().getParent()).setStyleName("pot");
+    
     for (RoundPanel panel : infoPanelArr) {
       panel.setStyleName("playerInfoPanel");
     }
-    potInfoPanel.add(new Label("Waiting for all players to buy-in..."));
-   
+    //potInfoPanel.add(new Label("Waiting for all players to buy-in..."));
+    setupHandlers();
+    
     if (Audio.isSupported()) {
     	betSound = Audio.createIfSupported();
         betSound.addSource(gameSounds.betMp3().getSafeUri()
@@ -321,6 +341,7 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
   
   @Override
   public void doBuyIn() {
+    
     disableButtons();
     for (int i = 0; i < MAX_PLAYERS; i++) {
       holeCardPanelArr[i].clear();
@@ -329,7 +350,6 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
     communityCards.clear();
     potInfoPanel.clear();
     potInfoPanel.add(new Label("Waiting for all players to buy-in..."));
-    
     
     if (AUTO_BUY_IN) {
       presenter.buyInDone(AUTO_BUY_IN_VALUE);
@@ -414,14 +434,14 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
       infoPanelArr[i].add(new Label("Chips: " + playerChips.get(i)));
       infoPanelArr[i].add(new Label("Bet: " + playerBets.get(i)));
       if (!playersInHand.contains(Player.values()[i])) {
-        holeCardPanelArr[i].setStyleName("foldedHoleCardPanel");
+        holeCardPanelArr[i].setStylePrimaryName("foldedHoleCardPanel");
         holeCardPanelArr[i].add(new HTMLPanel("<div class=\"overlay\"></div>"));
       }
       else if (i == turnIndex) {
-        holeCardPanelArr[i].setStyleName("currentTurnHoleCardPanel");
+        holeCardPanelArr[i].setStylePrimaryName("currentTurnHoleCardPanel");
       }
       else {
-        holeCardPanelArr[i].setStyleName("holeCardPanel");
+        holeCardPanelArr[i].setStylePrimaryName("holeCardPanel");
       }
     }
     placeCards(communityCards, createCardImages(board));
@@ -453,7 +473,7 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
       infoPanelArr[i].clear();
       infoPanelArr[i].add(new Label("Chips: " + playerChips.get(i)));
       if (!playersInHand.contains(Player.values()[i])) {
-        holeCardPanelArr[i].setStyleName("foldedHoleCardPanel");
+        holeCardPanelArr[i].setStylePrimaryName("foldedHoleCardPanel");
         holeCardPanelArr[i].add(new HTMLPanel("<div class=\"overlay\"></div>"));
       }
     }
@@ -480,6 +500,115 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
           (winners.size() > 0 ? " | Won by: " + sb.toString() : "")));
     }
     disableButtons();
+  }
+  
+  void setupHandlers(){
+    // Setup fold handler
+    
+    btnFold.addTapHandler(new TapHandler() {
+      
+      @Override
+      public void onTap(TapEvent event) {
+      //disableClicks();
+        playFoldSound();
+        presenter.moveMade(PokerMove.FOLD, 0);
+      }
+    });
+    
+    // Setup check handler
+    btnCheck.addTapHandler(new TapHandler() {
+      @Override
+      public void onTap(TapEvent event) {
+        //disableClicks();
+        if (currentBet - myCurrentBet != 0) {
+          playWrongMoveSound();
+          Window.alert("Current bet is not 0");
+          return;
+        }
+        playCheckSound();
+        presenter.moveMade(PokerMove.CHECK, 0);
+      }
+    });
+    
+    // Setup call handler
+    btnCall.addTapHandler(new TapHandler(){
+      @Override
+      public void onTap(TapEvent event) {
+        int callAmount = currentBet - myCurrentBet;
+        if (myChips < callAmount) {
+          playWrongMoveSound();
+          Window.alert("Insufficient chips to Call");
+          return;
+        }
+        if (callAmount == 0) {
+          playWrongMoveSound();
+          Window.alert("Can't call 0 amount");
+          return;
+        }
+        playCallSound();
+        presenter.moveMade(PokerMove.CALL, callAmount);
+      }
+    });
+    
+    // Setup bet handler
+    btnBet.addTapHandler(new TapHandler() {
+      @Override
+      public void onTap(TapEvent event){
+        //disableClicks();
+        int amount;
+        try {
+          amount = Integer.parseInt(txtAmount.getText());
+        }
+        catch (NumberFormatException ex) {
+          playWrongMoveSound();
+          Window.alert("Please enter a valid number");
+          return;
+        }
+        
+        if (amount > myChips) {
+          playWrongMoveSound();
+          Window.alert("Insufficient chips");
+          return;
+        }
+        
+        if (currentBet == 0) {
+          if (amount < PokerLogic.BIG_BLIND) {
+            playWrongMoveSound();
+            Window.alert("Bet cannot be less than big blind (" + PokerLogic.BIG_BLIND + ")");
+            return;
+          }
+          playBetSound();
+          presenter.moveMade(PokerMove.BET, amount);
+        }
+        else if (myCurrentBet + amount >= 2 * currentBet) {
+          playRaiseSound();
+          presenter.moveMade(PokerMove.RAISE, amount);
+        }
+        else {
+          playWrongMoveSound();
+          Window.alert("Invalid Raise amount");
+        }
+      }});
+    
+    // Setup allin handler
+    btnAllIn.addTapHandler(new TapHandler(){
+      @Override
+      public void onTap(TapEvent event) {
+        int amount = myChips;
+        if (currentBet == 0) {
+          playBetSound();
+          presenter.moveMade(PokerMove.BET, amount);
+        }
+        else if (amount + myCurrentBet <= currentBet) {
+          playCallSound();
+          presenter.moveMade(PokerMove.CALL, amount);
+        }
+        else {
+          playRaiseSound();
+          presenter.moveMade(PokerMove.RAISE, amount);
+        }
+      }
+    });
   }
 
   /*@UiHandler("btnFold")
