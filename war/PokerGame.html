@@ -6,7 +6,7 @@
     <title>Poker</title>
     <script type="text/javascript" language="javascript" src="poker_game/poker_game.nocache.js"></script>
     <style>
-	  .pokerTablePanel {
+    .pokerTablePanel {
 	      background-image: url('poker_table.jpg');
 		    background-repeat: no-repeat;
 	      background-position: center center;
@@ -101,9 +101,31 @@
 		    background-color:rgba(0, 0, 0, 0.6);
       }
       
+      #warning-message { display: none; }
+    @media only screen and (orientation:portrait){
+        #mainDiv { display:none; }
+        #warning-message { display:block; 
+        position:}
+    	}
+    @media only screen and (orientation:landscape){
+        #warning-message { display:none; }
+    }
+      
     </style>
+
+    <!--script>
+    	$(document).ready(function () {
+  				function reorient(e) {
+    			var portrait = (window.orientation % 180 == 0);
+    			$("body > div").css("-webkit-transform", !portrait ? "rotate(-90deg)" : "");
+  			}
+  		window.onorientationchange = reorient;
+  		window.setTimeout(reorient, 0);
+		});
+    </script-->
   </head>
   <body>
     <div id="mainDiv" width="400" height="400" ></div>
+    <div id="warning-message">This website is only viewable in landscape mode</div>
   </body>
 </html>
