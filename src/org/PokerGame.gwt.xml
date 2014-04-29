@@ -5,6 +5,7 @@
   <inherits name='com.google.common.collect.Collect'/>
   <inherits name='com.google.gwt.json.JSON'/>
   <inherits name='com.googlecode.mgwt.MGWT'/>
+  <inherits name="com.google.gwt.i18n.I18N"/>
   
   <!-- Inherit the default GWT style sheet.  You can change           -->
   <!-- the theme of your GWT application by uncommenting              -->

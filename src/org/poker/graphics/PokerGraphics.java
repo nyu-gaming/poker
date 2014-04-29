@@ -44,6 +44,7 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
   private static final boolean AUTO_BUY_IN = false;
   private static final int AUTO_BUY_IN_VALUE = 10000;
   private static final int MAX_PLAYERS = 4;
+  private static PokerMessages pokerMessages;
   
   @UiField
   LayoutPanel pokerTable;
@@ -152,6 +153,8 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
     PokerGraphicsUiBinder uiBinder = GWT.create(PokerGraphicsUiBinder.class);
     initWidget(uiBinder.createAndBindUi(this));
     MGWT.applySettings(MGWTSettings.getAppSetting());
+    
+    pokerMessages = (PokerMessages)GWT.create(PokerMessages.class);
     
     holeCardPanelArr = new RoundPanel[] {holeCards1, holeCards2, holeCards3,
             holeCards4};
@@ -344,7 +347,7 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
     }
     communityCards.clear();
     potInfoPanel.clear();
-    potInfoPanel.add(new Label("Waiting for all players to buy-in..."));
+    potInfoPanel.add(new Label(pokerMessages.waitingForBuyIn()));
     
     if (AUTO_BUY_IN) {
       presenter.buyInDone(AUTO_BUY_IN_VALUE);
@@ -352,7 +355,7 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
     }
     
     if (buyInPopup == null) {
-      buyInPopup = new PopupEnterValue("Enter buy-in amount", new PopupEnterValue.ValueEntered() {
+      buyInPopup = new PopupEnterValue(pokerMessages.enterBuyInAmount(), new PopupEnterValue.ValueEntered() {
         @Override
         public void setValue(int value) {
           presenter.buyInDone(value);
@@ -402,9 +405,7 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
       if(pot.getPlayersInPot().isEmpty()) {
         continue;
       }
-      potInfoPanel.add(new Label("Pot" + (i + 1) +
-          " -- Chips: " + pot.getChips() +
-          " | Bet: " + pot.getCurrentPotBet()));
+      potInfoPanel.add(new Label(pokerMessages.potInfo(i + 1, pot.getChips(), pot.getCurrentPotBet())));
       currentBet += pot.getCurrentPotBet();
     }
     disableButtons();
@@ -444,9 +445,7 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
     potInfoPanel.clear();
     for (int i = 0; i < pots.size(); i++) {
       Pot pot = pots.get(i);
-      potInfoPanel.add(new Label("Pot" + (i + 1) +
-          " -- Chips: " + pot.getChips() +
-          " | Bet: " + pot.getCurrentPotBet()));
+      potInfoPanel.add(new Label(pokerMessages.potInfo(i + 1, pot.getChips(), pot.getCurrentPotBet())));
       currentBet += pot.getCurrentPotBet();
     }
     disableButtons();
@@ -478,7 +477,7 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
     for (int i = 0; i < pots.size(); i++) {
       Pot pot = pots.get(i);
       List<Player> winners = pot.getPlayersInPot();
-      StringBuilder sb = new StringBuilder();
+      /*StringBuilder sb = new StringBuilder();
       for (int j = 0; j < winners.size(); j++) {
         sb.append(winners.get(j));
         if (j == winners.size() - 2) {
@@ -489,10 +488,11 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
         else if (j < winners.size() - 2) {
           sb.append(", ");
         }
-      }
-      potInfoPanel.add(new Label("Pot" + (i + 1) +
+      }*/
+      potInfoPanel.add(new Label(pokerMessages.winnerPotInfo(i + 1, pot.getChips(), winners)));
+      /*potInfoPanel.add(new Label("Pot" + (i + 1) +
           " -- Chips: " + pot.getChips() +
-          (winners.size() > 0 ? " | Won by: " + sb.toString() : "")));
+          (winners.size() > 0 ? " | Won by: " + sb.toString() : "")));*/
     }
     disableButtons();
   }
