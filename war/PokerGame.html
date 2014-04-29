@@ -12,17 +12,17 @@
 	      background-position: center center;
 	      background-size: 100%;
 	      width: 100%;
-	      height: 100%;
+	      padding-bottom: 54%;
 	      position: absolute;
       }
       .btnPanel {
       	position: absolute;
-      	margin-top: 58%
+      	margin-top: 54%
       }
       .pot {
       	position: absolute;
-      	margin-top: 20%;
-      	margin-left: 30%;
+      	margin-top: 10%;
+      	margin-left: 27%;
       }
       .potInfoPanel {
         /* position: relative;
@@ -53,46 +53,45 @@
         float:left;
       }
       .currentTurnHoleCardPanel {
+        width: 75px;
         border-style: solid;
         border-color: yellow;
         border-width: 2px;
       }
       .foldedHoleCardPanel {
-        position: absolute;
-        display:block;
+        width: 75px;
       }
-      .holeCardPanel-panel1,
+      /* .holeCardPanel-panel1,
       .currentTurnHoleCardPanel-panel1,
-      .foldedHoleCardPanel-panel1 {
-      	
-      	
-      }
+      .foldedHoleCardPanel-panel1 {} */
       
-       .playerSeat1 {
+      .playerSeat1 {
       	position: absolute;
-      	margin-left: 85%;
-      	margin-top: 13%;
+      	margin-left: 82%;
+      	margin-top: 10%;
       }
       
       .playerSeat2 {
       	position: absolute;
-      	margin-left: 77%;
-      	margin-top: 36%;
+      	margin-left: 72%;
+      	margin-top: 32%;
       }
       
       .playerSeat3 {
       	position: absolute;
       	margin-left: 15%;
-      	margin-top: 36%;
+      	margin-top: 32%;
       }
       
       .playerSeat4 {
       	position: absolute;
       	margin-left: 6%;
-      	margin-top: 13%;
+      	margin-top: 10%;
       }
       
       .overlay {
+        width: 75px;
+        height: 75px;
         position:absolute;
 		    top:0px;
 		    left:0px;
@@ -104,11 +103,12 @@
       #warning-message { display: none; }
     @media only screen and (orientation:portrait){
         #mainDiv { display:none; }
+        .buyin_popup { display:none; }
         #warning-message { display:block; 
         position:}
     	}
     @media only screen and (orientation:landscape){
-        #warning-message { display:none; }
+        #warning-message { display:none; position:absolute; top:45%; left:40%}
     }
       
     </style>

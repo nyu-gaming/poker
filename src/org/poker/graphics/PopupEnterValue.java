@@ -20,7 +20,21 @@ public class PopupEnterValue extends PopinDialog {
   public PopupEnterValue(String text, final ValueEntered valueEntered) {
     
     txtValue = new MTextBox();
-    btnEnter = new Button("Buy-in");
+    btnEnter = new Button(PokerGraphics.pokerConstants.buyIn());
+    
+    DialogPanel dialogPanel = new DialogPanel();
+    HorizontalPanel panel = new HorizontalPanel();
+    dialogPanel.getContent().add(panel);
+    
+    panel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+    panel.add(txtValue);
+    panel.add(btnEnter);
+    
+    dialogPanel.getDialogTitle().setText(text);
+    dialogPanel.showOkButton(false);
+    dialogPanel.showCancelButton(false);
+    dialogPanel.addStyleName("buyin_popup");
+    
     btnEnter.addTapHandler(new TapHandler() {
       @Override
       public void onTap(TapEvent event) {
@@ -28,15 +42,7 @@ public class PopupEnterValue extends PopinDialog {
         valueEntered.setValue(Integer.parseInt(txtValue.getText()));
       }
     });
-    DialogPanel dialogPanel = new DialogPanel();
-    dialogPanel.getDialogTitle().setText(text);
-    dialogPanel.showOkButton(false);
-    dialogPanel.showCancelButton(false);
-    HorizontalPanel panel = new HorizontalPanel();
-    panel.add(txtValue);
-    panel.add(btnEnter);
-    panel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-    dialogPanel.getContent().add(panel);
+    
     add(dialogPanel);
   }
   

@@ -1,4 +1,4 @@
-package org.poker.graphics;
+package org.poker.graphics.i18n;
 
 import com.google.gwt.i18n.client.Constants;
 
@@ -10,6 +10,9 @@ public interface PokerConstants extends Constants {
   @DefaultStringValue("Fold")
   String fold();
   
+  @DefaultStringValue("Check")
+  String check();
+  
   @DefaultStringValue("Call")
   String call();
   
@@ -20,6 +23,6 @@ public interface PokerConstants extends Constants {
   String raise();
   
   @DefaultStringValue("All In")
-  String allIn();
+  String allIn();  
 
 }

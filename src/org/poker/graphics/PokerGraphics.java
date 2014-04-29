@@ -9,6 +9,8 @@ import org.poker.client.PokerLogic;
 import org.poker.client.PokerMove;
 import org.poker.client.PokerPresenter;
 import org.poker.client.Pot;
+import org.poker.graphics.i18n.PokerConstants;
+import org.poker.graphics.i18n.PokerMessages;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
@@ -32,10 +34,6 @@ import com.googlecode.mgwt.ui.client.MGWTSettings;
 import com.googlecode.mgwt.ui.client.widget.Button;
 import com.googlecode.mgwt.ui.client.widget.LayoutPanel;
 import com.googlecode.mgwt.ui.client.widget.RoundPanel;
-//import com.google.gwt.user.client.ui.AbsolutePanel;
-//import com.google.gwt.user.client.ui.Button;
-//import com.google.gwt.user.client.ui.HorizontalPanel;
-//import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class PokerGraphics extends Composite implements PokerPresenter.View {
   public interface PokerGraphicsUiBinder extends UiBinder<Widget, PokerGraphics> {
@@ -44,7 +42,9 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
   private static final boolean AUTO_BUY_IN = false;
   private static final int AUTO_BUY_IN_VALUE = 10000;
   private static final int MAX_PLAYERS = 4;
-  private static PokerMessages pokerMessages;
+  private GameSounds gameSounds;
+  public static PokerMessages pokerMessages;
+  public static PokerConstants pokerConstants;
   
   @UiField
   LayoutPanel pokerTable;
@@ -148,13 +148,16 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
   
   public PokerGraphics() {
     CardImages cardImages = GWT.create(CardImages.class);
-    GameSounds gameSounds = GWT.create(GameSounds.class);
+    gameSounds = GWT.create(GameSounds.class);
     this.cardImageSupplier = new CardImageSupplier(cardImages);
     PokerGraphicsUiBinder uiBinder = GWT.create(PokerGraphicsUiBinder.class);
     initWidget(uiBinder.createAndBindUi(this));
     MGWT.applySettings(MGWTSettings.getAppSetting());
     
     pokerMessages = (PokerMessages)GWT.create(PokerMessages.class);
+    pokerConstants = (PokerConstants)GWT.create(PokerConstants.class);
+    
+    setupButtons();
     
     holeCardPanelArr = new RoundPanel[] {holeCards1, holeCards2, holeCards3,
             holeCards4};
@@ -173,6 +176,7 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
     infoPanelArr = new CellPanel[] {info1, info2, info3,
         info4, info5, info6, info7, info8, info9};*/
     pokerTable.setStyleName("pokerTablePanel");
+    communityCards.setStyleName("communityCards");
     potInfoPanel.setStyleName("potInfoPanel");
     ((LayoutPanel)potInfoPanel.getParent().getParent()).setStyleName("pot");
     
@@ -181,80 +185,67 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
     }
     //potInfoPanel.add(new Label("Waiting for all players to buy-in..."));
     setupHandlers();
-    
+    setupAudio();
+  }
+  
+  private void setupButtons() {
+    btnFold.setText(pokerConstants.fold());
+    btnCheck.setText(pokerConstants.check());
+    btnCall.setText(pokerConstants.call());
+    btnBet.setText(pokerConstants.raise());
+    btnAllIn.setText(pokerConstants.allIn());
+  }
+  
+  private void setupAudio() {
     if (Audio.isSupported()) {
-    	betSound = Audio.createIfSupported();
-        betSound.addSource(gameSounds.betMp3().getSafeUri()
-                        .asString(), AudioElement.TYPE_MP3);
-        betSound.addSource(gameSounds.betWav().getSafeUri()
-                        .asString(), AudioElement.TYPE_WAV);
-        
-        callSound = Audio.createIfSupported();
-        callSound.addSource(gameSounds.callMp3().getSafeUri()
-                        .asString(), AudioElement.TYPE_MP3);
-        callSound.addSource(gameSounds.callWav().getSafeUri()
-                        .asString(), AudioElement.TYPE_WAV);
-        
-        foldSound = Audio.createIfSupported();
-        foldSound.addSource(gameSounds.foldMp3().getSafeUri()
-                        .asString(), AudioElement.TYPE_MP3);
-        foldSound.addSource(gameSounds.foldWav().getSafeUri()
-                        .asString(), AudioElement.TYPE_WAV);
-        
-        raiseSound = Audio.createIfSupported();
-        raiseSound.addSource(gameSounds.raiseMp3().getSafeUri()
-                        .asString(), AudioElement.TYPE_MP3);
-        raiseSound.addSource(gameSounds.raiseWav().getSafeUri()
-                        .asString(), AudioElement.TYPE_WAV);
-        
-        checkSound = Audio.createIfSupported();
-        checkSound.addSource(gameSounds.checkMp3().getSafeUri()
-                        .asString(), AudioElement.TYPE_MP3);
-        checkSound.addSource(gameSounds.checkWav().getSafeUri()
-                        .asString(), AudioElement.TYPE_WAV);
-        
-        wrongMoveSound = Audio.createIfSupported();
-        wrongMoveSound.addSource(gameSounds.wrongMoveMp3().getSafeUri()
-                        .asString(), AudioElement.TYPE_MP3);
-        wrongMoveSound.addSource(gameSounds.wrongMoveWav().getSafeUri()
-                        .asString(), AudioElement.TYPE_WAV);
+      betSound = Audio.createIfSupported();
+      betSound.addSource(gameSounds.betMp3().getSafeUri().asString(), AudioElement.TYPE_MP3);
+      betSound.addSource(gameSounds.betWav().getSafeUri().asString(), AudioElement.TYPE_WAV);
+      
+      callSound = Audio.createIfSupported();
+      callSound.addSource(gameSounds.callMp3().getSafeUri().asString(), AudioElement.TYPE_MP3);
+      callSound.addSource(gameSounds.callWav().getSafeUri().asString(), AudioElement.TYPE_WAV);
+      
+      foldSound = Audio.createIfSupported();
+      foldSound.addSource(gameSounds.foldMp3().getSafeUri().asString(), AudioElement.TYPE_MP3);
+      foldSound.addSource(gameSounds.foldWav().getSafeUri().asString(), AudioElement.TYPE_WAV);
+      
+      raiseSound = Audio.createIfSupported();
+      raiseSound.addSource(gameSounds.raiseMp3().getSafeUri().asString(), AudioElement.TYPE_MP3);
+      raiseSound.addSource(gameSounds.raiseWav().getSafeUri().asString(), AudioElement.TYPE_WAV);
+      
+      checkSound = Audio.createIfSupported();
+      checkSound.addSource(gameSounds.checkMp3().getSafeUri().asString(), AudioElement.TYPE_MP3);
+      checkSound.addSource(gameSounds.checkWav().getSafeUri().asString(), AudioElement.TYPE_WAV);
+      
+      wrongMoveSound = Audio.createIfSupported();
+      wrongMoveSound.addSource(gameSounds.wrongMoveMp3().getSafeUri().asString(), AudioElement.TYPE_MP3);
+      wrongMoveSound.addSource(gameSounds.wrongMoveWav().getSafeUri().asString(), AudioElement.TYPE_WAV);
     }
   }
-  
-  
+
   public void playBetSound() {
-          if (betSound != null)
-                  betSound.play();
+    if (betSound != null) betSound.play();
   }
-  
   
   public void playRaiseSound() {
-          if (betSound != null)
-                  betSound.play();
+    if (betSound != null) betSound.play();
   }
-  
   
   public void playCallSound() {
-          if (betSound != null)
-                  betSound.play();
+    if (betSound != null) betSound.play();
   }
-  
   
   public void playFoldSound() {
-          if (betSound != null)
-                  betSound.play();
+    if (betSound != null) betSound.play();
   }
-  
   
   public void playCheckSound() {
-          if (betSound != null)
-                  betSound.play();
+    if (betSound != null) betSound.play();
   }
   
-  
   public void playWrongMoveSound() {
-          if (betSound != null)
-                  betSound.play();
+    if (betSound != null) betSound.play();
   }
   
   private List<Image> createCardImages(List<Optional<Card>> cards) {
@@ -347,7 +338,7 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
     }
     communityCards.clear();
     potInfoPanel.clear();
-    potInfoPanel.add(new Label(pokerMessages.waitingForBuyIn()));
+    potInfoPanel.add(new Label(pokerMessages.info_waitingForBuyIn()));
     
     if (AUTO_BUY_IN) {
       presenter.buyInDone(AUTO_BUY_IN_VALUE);
@@ -355,7 +346,7 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
     }
     
     if (buyInPopup == null) {
-      buyInPopup = new PopupEnterValue(pokerMessages.enterBuyInAmount(), new PopupEnterValue.ValueEntered() {
+      buyInPopup = new PopupEnterValue(pokerMessages.info_enterBuyInAmount(), new PopupEnterValue.ValueEntered() {
         @Override
         public void setValue(int value) {
           presenter.buyInDone(value);
@@ -385,8 +376,8 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
     for (int i = 0; i < numOfPlayers; i++) {
       placeCards(holeCardPanelArr[i], createCardImages(holeCards.get(i)));
       infoPanelArr[i].clear();
-      infoPanelArr[i].add(new Label("Chips: " + playerChips.get(i)));
-      infoPanelArr[i].add(new Label("Bet: " + playerBets.get(i)));
+      infoPanelArr[i].add(new Label(pokerMessages.playerChipsInfo(playerChips.get(i))));
+      infoPanelArr[i].add(new Label(pokerMessages.playerBetInfo(playerBets.get(i))));
       if (!playersInHand.contains(Player.values()[i])) {
         holeCardPanelArr[i].setStyleName("foldedHoleCardPanel");
         holeCardPanelArr[i].add(new HTMLPanel("<div class=\"overlay\"></div>"));
@@ -427,8 +418,8 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
     for (int i = 0; i < numOfPlayers; i++) {
       placeCards(holeCardPanelArr[i], createCardImages(holeCards.get(i)));
       infoPanelArr[i].clear();
-      infoPanelArr[i].add(new Label("Chips: " + playerChips.get(i)));
-      infoPanelArr[i].add(new Label("Bet: " + playerBets.get(i)));
+      infoPanelArr[i].add(new Label(pokerMessages.playerChipsInfo(playerChips.get(i))));
+      infoPanelArr[i].add(new Label(pokerMessages.playerBetInfo(playerBets.get(i))));
       if (!playersInHand.contains(Player.values()[i])) {
         holeCardPanelArr[i].setStylePrimaryName("foldedHoleCardPanel");
         holeCardPanelArr[i].add(new HTMLPanel("<div class=\"overlay\"></div>"));
@@ -465,7 +456,7 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
     for (int i = 0; i < numOfPlayers; i++) {
       placeCards(holeCardPanelArr[i], createCardImages(holeCards.get(i)));
       infoPanelArr[i].clear();
-      infoPanelArr[i].add(new Label("Chips: " + playerChips.get(i)));
+      infoPanelArr[i].add(new Label(pokerMessages.playerChipsInfo(playerChips.get(i))));
       if (!playersInHand.contains(Player.values()[i])) {
         holeCardPanelArr[i].setStylePrimaryName("foldedHoleCardPanel");
         holeCardPanelArr[i].add(new HTMLPanel("<div class=\"overlay\"></div>"));
@@ -517,7 +508,7 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
         //disableClicks();
         if (currentBet - myCurrentBet != 0) {
           playWrongMoveSound();
-          Window.alert("Current bet is not 0");
+          Window.alert(pokerMessages.err_betNotZero());
           return;
         }
         playCheckSound();
@@ -532,12 +523,12 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
         int callAmount = currentBet - myCurrentBet;
         if (myChips < callAmount) {
           playWrongMoveSound();
-          Window.alert("Insufficient chips to Call");
+          Window.alert(pokerMessages.err_insufficientChipsToCall());
           return;
         }
         if (callAmount == 0) {
           playWrongMoveSound();
-          Window.alert("Can't call 0 amount");
+          Window.alert(pokerMessages.err_callZero());
           return;
         }
         playCallSound();
@@ -556,20 +547,20 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
         }
         catch (NumberFormatException ex) {
           playWrongMoveSound();
-          Window.alert("Please enter a valid number");
+          Window.alert(pokerMessages.err_invalidNumber());
           return;
         }
         
         if (amount > myChips) {
           playWrongMoveSound();
-          Window.alert("Insufficient chips");
+          Window.alert(pokerMessages.err_insufficientChips());
           return;
         }
         
         if (currentBet == 0) {
           if (amount < PokerLogic.BIG_BLIND) {
             playWrongMoveSound();
-            Window.alert("Bet cannot be less than big blind (" + PokerLogic.BIG_BLIND + ")");
+            Window.alert(pokerMessages.err_betLessThanBB(PokerLogic.BIG_BLIND));
             return;
           }
           playBetSound();
@@ -581,7 +572,7 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
         }
         else {
           playWrongMoveSound();
-          Window.alert("Invalid Raise amount");
+          Window.alert(pokerMessages.err_invalidRaise());
         }
       }});
     
@@ -605,98 +596,6 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
       }
     });
   }
-
-  /*@UiHandler("btnFold")
-  void onClickFoldBtn(ClickEvent e) {
-    //disableClicks();
-	playFoldSound();
-    presenter.moveMade(PokerMove.FOLD, 0);
-  }
-  
-  @UiHandler("btnCheck")
-  void onClickCheckBtn(ClickEvent e) {
-    //disableClicks();
-    if (currentBet - myCurrentBet != 0) {
-      playWrongMoveSound();
-      Window.alert("Current bet is not 0");
-      return;
-    }
-    playCheckSound();
-    presenter.moveMade(PokerMove.CHECK, 0);
-  }
-  
-  @UiHandler("btnCall")
-  void onClickCallBtn(ClickEvent e) {
-    //disableClicks();
-    int callAmount = currentBet - myCurrentBet;
-    if (myChips < callAmount) {
-      playWrongMoveSound();
-      Window.alert("Insufficient chips to Call");
-      return;
-    }
-    if (callAmount == 0) {
-      playWrongMoveSound();
-      Window.alert("Can't call 0 amount");
-      return;
-    }
-    playCallSound();
-    presenter.moveMade(PokerMove.CALL, callAmount);
-  }
-  
-  @UiHandler("btnBet")
-  void onClickBetBtn(ClickEvent e) {
-    //disableClicks();
-    int amount;
-    try {
-      amount = Integer.parseInt(txtAmount.getText());
-    }
-    catch (NumberFormatException ex) {
-      playWrongMoveSound();
-      Window.alert("Please enter a valid number");
-      return;
-    }
-    
-    if (amount > myChips) {
-      playWrongMoveSound();
-      Window.alert("Insufficient chips");
-      return;
-    }
-    
-    if (currentBet == 0) {
-      if (amount < PokerLogic.BIG_BLIND) {
-        playWrongMoveSound();
-        Window.alert("Bet cannot be less than big blind (" + PokerLogic.BIG_BLIND + ")");
-        return;
-      }
-      playBetSound();
-      presenter.moveMade(PokerMove.BET, amount);
-    }
-    else if (myCurrentBet + amount >= 2 * currentBet) {
-      playRaiseSound();
-      presenter.moveMade(PokerMove.RAISE, amount);
-    }
-    else {
-      playWrongMoveSound();
-      Window.alert("Invalid Raise amount");
-    }
-  }
-  
-  @UiHandler("btnAllIn")
-  void onClickAllInBtn(ClickEvent e) {
-    int amount = myChips;
-    if (currentBet == 0) {
-      playBetSound();
-      presenter.moveMade(PokerMove.BET, amount);
-    }
-    else if (amount + myCurrentBet <= currentBet) {
-      playCallSound();
-      presenter.moveMade(PokerMove.CALL, amount);
-    }
-    else {
-      playRaiseSound();
-      presenter.moveMade(PokerMove.RAISE, amount);
-    }
-  }*/
   
   @Override
   public void makeYourMove() {
