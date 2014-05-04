@@ -159,15 +159,22 @@ public class PokerLogic extends AbstractPokerLogicBase {
       }
     }
     
+    int lastValidPotIndex = 0;
+    for (int i = winnersForEachPot.size() - 1; i >= 0; i--) {
+      if (winnersForEachPot.get(i).size() != 0) {
+        lastValidPotIndex = i;
+        break;
+      }
+    }
+    
     for (int i = 0; i < playerIds.size(); i++) {
-      if(winnersForEachPot.get(winnersForEachPot.size() - 1).contains(playerIds.get(i))) {
+      if(winnersForEachPot.get(lastValidPotIndex).contains(playerIds.get(i))) {
         endGameMapBuilder.put(playerIds.get(i), 1);
       }
       else {
         endGameMapBuilder.put(playerIds.get(i), 0);
       }
     }
-    
     
     
     ImmutableMap.Builder<String, Integer> playerIdToTokensBuilder = ImmutableMap.builder();
@@ -541,10 +548,12 @@ public class PokerLogic extends AbstractPokerLogicBase {
     // Bet cannot be made in PreFlop round
     check(lastState.getCurrentRound() != BettingRound.PRE_FLOP);
     
-    int nextTurnIndex = getNextTurnIndex(lastState);
     int playerIndex = lastState.getWhoseMove().ordinal();
     int currentPlayerChips = lastState.getPlayerChips().get(playerIndex);
     boolean isAllIn = (currentPlayerChips == betAmount);
+    
+    boolean noPlayersLeft = hasGameEnded(lastState, PokerMove.RAISE, betAmount);
+    int nextTurnIndex = noPlayersLeft? playerIndex : getNextTurnIndex(lastState);
     
     List<Operation> operations = Lists.newArrayList();
     
@@ -557,6 +566,10 @@ public class PokerLogic extends AbstractPokerLogicBase {
     operations.add(new Set(WHOSE_MOVE, P[nextTurnIndex]));
     
     operations.add(new Set(CURRENT_BETTER, P[playerIndex]));
+    
+    if (noPlayersLeft) {
+      operations.add(new Set(CURRENT_ROUND, BettingRound.SHOWDOWN.name()));
+    }
     
     // Set player bets
     ImmutableList<Integer> newPlayerBets = addOrReplaceInList(lastState.getPlayerBets(),
@@ -594,6 +607,13 @@ public class PokerLogic extends AbstractPokerLogicBase {
           PLAYER_BETS, createNewList(playerIds.size(), Integer.valueOf(0))));
     }
     operations.add(new Set(POTS, newPots));
+    
+    if(noPlayersLeft){
+      BettingRound currentRound = lastState.getCurrentRound();
+      int numberOfPlayers = lastState.getNumberOfPlayers();
+      operations.addAll(makeHoleCardsVisible(lastState, PokerMove.RAISE));
+      operations.addAll(openAllCommunityCards(currentRound, numberOfPlayers));
+    }
 
     return operations;
   }
@@ -625,9 +645,11 @@ public class PokerLogic extends AbstractPokerLogicBase {
     // In Raise move existing bet should be non-zero, otherwise it'll be a bet
     check(totalRequiredBet != 0, "Raise Move: Zero existing bet");
     
+    boolean noPlayersLeft = hasGameEnded(lastState, PokerMove.RAISE, additionalAmount);
+    int nextTurnIndex = noPlayersLeft? playerIndex : getNextTurnIndex(lastState);
+    
     List<Operation> operations = Lists.newArrayList();
     
-    int nextTurnIndex = getNextTurnIndex(lastState);
     operations.add(new SetTurn(playerIds.get(nextTurnIndex)));
     
     operations.add(new Set(PREVIOUS_MOVE, PokerMove.RAISE.name()));
@@ -638,6 +660,10 @@ public class PokerLogic extends AbstractPokerLogicBase {
     operations.add(new Set(WHOSE_MOVE, P[nextTurnIndex]));
     
     operations.add(new Set(CURRENT_BETTER, P[playerIndex]));
+    
+    if (noPlayersLeft) {
+      operations.add(new Set(CURRENT_ROUND, BettingRound.SHOWDOWN.name()));
+    }
     
     // Set player bets
     ImmutableList<Integer> newPlayerBets = addOrReplaceInList(lastState.getPlayerBets(),
@@ -695,9 +721,17 @@ public class PokerLogic extends AbstractPokerLogicBase {
     }
     operations.add(new Set(POTS, newPots));
     
+    if(noPlayersLeft){
+      BettingRound currentRound = lastState.getCurrentRound();
+      int numberOfPlayers = lastState.getNumberOfPlayers();
+      operations.addAll(makeHoleCardsVisible(lastState, PokerMove.RAISE));
+      operations.addAll(openAllCommunityCards(currentRound, numberOfPlayers));
+    }
+    
     return operations;
   }
- 
+  
+  
   /**
    * Returns true if the game ends after this move because all other 
    * players are all-in or have folded.
@@ -708,10 +742,12 @@ public class PokerLogic extends AbstractPokerLogicBase {
    */
   private boolean hasGameEnded(PokerState lastState, PokerMove move, int additionalAmount) {
     // TODO fix next turn in new round methods
-    if (move == PokerMove.BET || move == PokerMove.RAISE) {
-      //Game cannot get over after a bet or a raise
+    
+    // If all other players are all-in, even bet/raise can result in end of round/game
+    /*if (move == PokerMove.BET || move == PokerMove.RAISE) {
       return false;
-    }
+    }*/
+    
     if (lastState.getCurrentRound() == BettingRound.RIVER) {
       //Method doNewRoundAfterXyzMove() will handle this scenario
       return false;
@@ -734,7 +770,8 @@ public class PokerLogic extends AbstractPokerLogicBase {
         // Don't count because player folded
         continue;
       }
-      if(playerChipsLeft == 0) {
+      if(playerChipsLeft == 0 &&
+          !(isCurrentPlayer && (move == PokerMove.BET || move == PokerMove.RAISE))) {
         // This player is all-in, move on.
         continue;
       }
@@ -745,6 +782,12 @@ public class PokerLogic extends AbstractPokerLogicBase {
         return false;
       }
     }
+    
+    // This could only be current player. No one else left.
+    if (playersLeft == 1 && (move == PokerMove.BET || move == PokerMove.RAISE)) {
+      return true;
+    }
+    
     // Check if player left has matched the current bet (this can't be current player).
     if (playersLeft == 1 && lastState.getPlayerBets().get(lastPlayer.ordinal()) < requiredBet) {
       // Last player left is still to act
@@ -1033,6 +1076,7 @@ public class PokerLogic extends AbstractPokerLogicBase {
    */
   private boolean isNewRoundStarting(PokerState lastState,
       PokerMove previousMove, int additionalAmount) {
+    
     if (previousMove == PokerMove.BET || previousMove == PokerMove.RAISE) {
       return false;
     }
@@ -1464,8 +1508,8 @@ public class PokerLogic extends AbstractPokerLogicBase {
    * @return
    */
   private List<Operation> makeHoleCardsVisible(PokerState lastState, PokerMove move) {
-    check(move != PokerMove.BET, "Game cannot end with a Bet move");
-    check(move != PokerMove.RAISE, "Game cannot end with a Raise move");
+    //check(move != PokerMove.BET, "Game cannot end with a Bet move");
+    //check(move != PokerMove.RAISE, "Game cannot end with a Raise move");
     
     List<Player> playersInHand;
     if(move == PokerMove.FOLD) {
