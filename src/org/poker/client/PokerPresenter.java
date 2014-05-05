@@ -159,7 +159,12 @@ public class PokerPresenter {
     }
     // Check if this is an AI player
     if(updateUI.isAiPlayer()) {
-      //TODO: to be done in a later HW
+      Map<String, Object> apiLastState = updateUI.getLastState();
+      PokerState lastState = null;
+      if (apiLastState != null && !apiLastState.isEmpty()) {
+        lastState = pokerLogicHelper.gameApiStateToPokerState(apiLastState);
+      }
+      container.sendMakeMove(new AILogic().decideMove(pokerState, lastState, playerIdList));
       return;
     }
     

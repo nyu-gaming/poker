@@ -1,5 +1,8 @@
 package org.poker.client;
 
+import java.util.Arrays;
+import java.util.List;
+
 public abstract class AbstractPokerLogicBase {
   
   public static final int SMALL_BLIND = 100;
@@ -24,5 +27,31 @@ public abstract class AbstractPokerLogicBase {
   protected static final String CHIPS = "chips";
   protected static final String CURRENT_POT_BET = "currentPotBet";
   protected static final String PLAYERS_IN_POT = "playersInPot";
+  
+  protected void check(boolean val, Object... debugArguments) {
+    if (!val) {
+      throw new RuntimeException("We have a hacker! debugArguments="
+          + Arrays.toString(debugArguments));
+    }
+  }
+  
+  protected int calculateLastRequiredBet(PokerState lastState) {
+    List<Pot> pots = lastState.getPots();
+    int totalRequiredBet = 0;
+    for(Pot pot : pots) {
+      totalRequiredBet += pot.getCurrentPotBet();
+    }
+    return totalRequiredBet;
+  }
+  
+  protected int calculateTotalPotAmount(PokerState state) {
+    int amount = 0;
+    if (state != null) {
+      for (Pot pot : state.getPots()) {
+        amount += pot.getChips();
+      }
+    }
+    return amount;
+  }
 
 }
