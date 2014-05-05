@@ -15,7 +15,7 @@ import com.google.common.base.Optional;
 
 public class AIHelper {
   
-  static final int trials = 1000;
+  static final int trials = 10000;
   
   private static RandomCardProvider cardProvider = new AIHelper.RandomCardProvider();
   
@@ -26,15 +26,19 @@ public class AIHelper {
     List<Optional<Card>> opponentHoleCards = new ArrayList<Optional<Card>>();
     
     holeCards.add(Optional.of(new Card( Suit.fromFirstLetterLowerCase("s"), Rank.fromFirstLetter("14"))));
-    holeCards.add(Optional.of(new Card( Suit.fromFirstLetterLowerCase("c"), Rank.fromFirstLetter("14"))));
+    holeCards.add(Optional.of(new Card( Suit.fromFirstLetterLowerCase("c"), Rank.fromFirstLetter("13"))));
     
-    opponentHoleCards.add(Optional.of(new Card( Suit.fromFirstLetterLowerCase("d"), Rank.fromFirstLetter("3"))));
-    opponentHoleCards.add(Optional.of(new Card( Suit.fromFirstLetterLowerCase("c"), Rank.fromFirstLetter("7"))));
+    opponentHoleCards.add(Optional.of(new Card( Suit.fromFirstLetterLowerCase("d"), Rank.fromFirstLetter("2"))));
+    opponentHoleCards.add(Optional.of(new Card( Suit.fromFirstLetterLowerCase("h"), Rank.fromFirstLetter("3"))));
     
-    board.add(Optional.of(new Card( Suit.fromFirstLetterLowerCase("s"), Rank.fromFirstLetter("13"))));
-    board.add(Optional.of(new Card( Suit.fromFirstLetterLowerCase("h"), Rank.fromFirstLetter("2"))));
-    board.add(Optional.of(new Card( Suit.fromFirstLetterLowerCase("h"), Rank.fromFirstLetter("3"))));
-    board.add(Optional.of(new Card( Suit.fromFirstLetterLowerCase("s"), Rank.fromFirstLetter("13"))));
+    //board.add(Optional.of(new Card( Suit.fromFirstLetterLowerCase("s"), Rank.fromFirstLetter("13"))));
+    //board.add(Optional.of(new Card( Suit.fromFirstLetterLowerCase("h"), Rank.fromFirstLetter("2"))));
+    //board.add(Optional.of(new Card( Suit.fromFirstLetterLowerCase("h"), Rank.fromFirstLetter("3"))));
+    //board.add(Optional.of(new Card( Suit.fromFirstLetterLowerCase("s"), Rank.fromFirstLetter("13"))));
+    board.add(Optional.fromNullable(n));
+    board.add(Optional.fromNullable(n));
+    board.add(Optional.fromNullable(n));
+    board.add(Optional.fromNullable(n));
     board.add(Optional.fromNullable(n));
     
     AIHelper ai = new AIHelper();
@@ -45,9 +49,6 @@ public class AIHelper {
   
   public double monteCarloPokerSimulation(List<Optional<Card>> board, List<Optional<Card>> holeCards, List<Optional<Card>> opponentHoleCards  ) {
     // Remove present cards from the random card select pool
-    cardProvider.removeCards(board);
-    cardProvider.removeCards(holeCards);
-    cardProvider.removeCards(opponentHoleCards);
     
     return simulate(board, holeCards, opponentHoleCards);
   }
@@ -61,10 +62,15 @@ public class AIHelper {
     List<Optional<Card>> opponentHoleCardsCopy;
     
     for(int i = 0 ; i < trials; i++) {
+      cardProvider.removeCards(board);
+      cardProvider.removeCards(holeCards);
+      cardProvider.removeCards(opponentHoleCards);
+      
       boardCopy = copy(board);
       holeCardsCopy = copy(holeCards);
       opponentHoleCardsCopy = copy(opponentHoleCards);
       assignCards(boardCopy, holeCardsCopy, opponentHoleCardsCopy);
+      
       aIfinder = new BestHandFinder(fromOptionalToList(boardCopy), fromOptionalToList(holeCardsCopy));
       opponentFinder = new BestHandFinder(fromOptionalToList(boardCopy), fromOptionalToList(opponentHoleCardsCopy));
       aiHand = aIfinder.find();
@@ -72,10 +78,12 @@ public class AIHelper {
       if (aiHand.compareRanking(opponentHand) >= 0 ) {
         winOrTies ++;
       }
+      
+      // refresh the card pool for second trial
+      cardProvider.refreshCardPool();
+      
     }
     return (winOrTies * 1.0 / trials);
-    
-    
     
   }
   
@@ -115,21 +123,27 @@ public class AIHelper {
   
   private static class RandomCardProvider {
     private List<Optional<Card>> cardPool = new ArrayList<Optional<Card>>();
+    private List<Optional<Card>> removedCards = new ArrayList<Optional<Card>>();
     private ArrayList<String> suits= new ArrayList<String>();
     
+    Random r;
+    
     public RandomCardProvider() {
+      r = new Random();
       generateCards();
     }
     
     public void removeCards(List<Optional<Card>> cards) {
-      for(Optional<Card> card : cards) {
-        if(card.isPresent()){
-        cards.remove(card);
+      for(int i = 0; i < cards.size(); i++) {
+        if(cards.get(i).isPresent()){
+          cardPool.remove(cards.get(i));
+          removedCards.add(cards.get(i));
         }
       }
+      return;
     }
     
-    private void generateCards() {
+    public void generateCards() {
       Optional<Card> card;
       suits.add("s");
       suits.add("c");
@@ -145,13 +159,18 @@ public class AIHelper {
     
   private Optional<Card> getRandomCard() {
       Optional<Card> card;
-      Random r = new Random();
       int i = -1;
       i = r.nextInt(cardPool.size());
       card = cardPool.get(i);
       cardPool.remove(i);
+      removedCards.add(card);
       return card;
     }
+  
+  public void refreshCardPool() {
+    cardPool.addAll(removedCards);
+    removedCards.clear();
+  }
 
   }
   
