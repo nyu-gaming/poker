@@ -1264,15 +1264,6 @@ public class PokerLogic extends AbstractPokerLogicBase {
     return operations;
   }
   
-  private int calculateLastRequiredBet(PokerState lastState) {
-    List<Pot> pots = lastState.getPots();
-    int totalRequiredBet = 0;
-    for(Pot pot : pots) {
-      totalRequiredBet += pot.getCurrentPotBet();
-    }
-    return totalRequiredBet;
-  }
-  
   /**
    * Returns the Pot object in JSON based format.
    * 
@@ -1537,7 +1528,7 @@ public class PokerLogic extends AbstractPokerLogicBase {
    * @param operations
    * @return Object from first Set containing given key; null otherwise.
    */
-  private Object getSetOperationVal(String key, List<Operation> operations) {
+  public Object getSetOperationVal(String key, List<Operation> operations) {
     Object value = null;
     if(operations != null && key != null) {
       for(Operation operation : operations) {
@@ -1577,12 +1568,4 @@ public class PokerLogic extends AbstractPokerLogicBase {
     String suitString = Suit.values()[suit].getFirstLetterLowerCase();
     return rankString + suitString;
   }
-  
-  private void check(boolean val, Object... debugArguments) {
-    if (!val) {
-      throw new RuntimeException("We have a hacker! debugArguments="
-          + Arrays.toString(debugArguments));
-    }
-  }
-  
 }
