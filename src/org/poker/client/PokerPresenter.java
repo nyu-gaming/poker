@@ -3,6 +3,7 @@ package org.poker.client;
 import java.util.List;
 import java.util.Map;
 
+import org.game_api.GameApi;
 import org.game_api.GameApi.Container;
 import org.game_api.GameApi.ContainerConnector;
 import org.game_api.GameApi.UpdateUI;

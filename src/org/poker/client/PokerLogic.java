@@ -1431,7 +1431,7 @@ public class PokerLogic extends AbstractPokerLogicBase {
    * @param state
    * @return
    */
-  private boolean isBigBlindMove(PokerState state) {
+  public boolean isBigBlindMove(PokerState state) {
     int numberOfPlayers = state.getNumberOfPlayers();
     int bigBlindIndex = numberOfPlayers > 2 ? 2 : 1;
     return state.getWhoseMove().ordinal() == bigBlindIndex;

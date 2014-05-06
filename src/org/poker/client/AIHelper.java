@@ -15,7 +15,7 @@ import com.google.common.base.Optional;
 
 public class AIHelper {
   
-  static final int trials = 10000;
+  static final int trials = 1000;
   
   private static RandomCardProvider cardProvider = new AIHelper.RandomCardProvider();
   
