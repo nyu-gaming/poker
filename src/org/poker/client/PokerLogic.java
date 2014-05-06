@@ -70,7 +70,7 @@ public class PokerLogic extends AbstractPokerLogicBase {
       if(lastMove.get(0) instanceof AttemptChangeTokens) {
         // Player's move was to "buy-in"
         int buyInAmount = playerIdToNumberOfTokensInPot.get(lastMovePlayerId);
-        return getInitialBuyInMove(lastMovePlayerId, buyInAmount, playerIdToNumberOfTokensInPot);
+        return getInitialBuyInMove(lastMovePlayerId,playerIds, buyInAmount, playerIdToNumberOfTokensInPot);
       }
       else {
         // Initial move performed by the dealer
@@ -1132,8 +1132,8 @@ public class PokerLogic extends AbstractPokerLogicBase {
    * @param buyInAmount
    * @return
    */
-  List<Operation> getInitialBuyInMove(
-      String playerId, int buyInAmount, Map<String, Integer> playerIdToTokensInPot) {
+  List<Operation> getInitialBuyInMove(String playerId, List<String> playerIds,
+      int buyInAmount, Map<String, Integer> playerIdToTokensInPot) {
     // Add new value
     ImmutableMap.Builder<String, Integer> builder = ImmutableMap.builder();
     for (String key : playerIdToTokensInPot.keySet()) {
@@ -1145,6 +1145,7 @@ public class PokerLogic extends AbstractPokerLogicBase {
       }
     }
     return ImmutableList.<Operation>of(
+        new SetTurn(playerIds.get((playerIds.indexOf(playerId) + 1) % playerIds.size())),
         new AttemptChangeTokens(
             ImmutableMap.<String, Integer>of(playerId, buyInAmount*(-1)),
             builder.build()));

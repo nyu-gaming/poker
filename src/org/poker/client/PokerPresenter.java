@@ -119,12 +119,16 @@ public class PokerPresenter {
       // Check that this is not an outside viewer
       if (myPlayer.isPresent()) {
         // If current player has not done the buy-in
-        if (!buyInSuccessfullyDone()) {
-          view.doBuyIn();
+        if(updateUI.isAiPlayer()) {
+          buyInDone(10000);
+          return;
         }
-        // Check if everyone has done a buy-In and current player is the dealer
-        else if (canGameStart() && isDealer()) {
+        String playerToBuyIn = getPlayerToBuyIn();
+        if (playerToBuyIn == null && isDealer()) {
           sendInitialMove(playerIdList);
+        }
+        else if (playerIdList.indexOf(playerToBuyIn) == myPlayer.get().ordinal()) {
+          view.doBuyIn();
         }
       }
       return;
@@ -210,9 +214,13 @@ public class PokerPresenter {
    * 
    * @return
    */
-  private boolean buyInSuccessfullyDone() {
-    int myPlayerIndex = myPlayer.get().ordinal();
-    return playerIdToTokensInPot.get(playerIdList.get(myPlayerIndex)) != 0;
+  private String getPlayerToBuyIn() {
+    for (String playerId : playerIdList) {
+      if (playerIdToTokensInPot.get(playerId) == 0) {
+        return playerId;
+      }
+    }
+    return null;
   }
   
   /**
@@ -255,7 +263,8 @@ public class PokerPresenter {
    */
   public void buyInDone(int amount) {
     String myPlayerId = playerIdList.get(myPlayer.get().ordinal());
-    container.sendMakeMove(pokerLogic.getInitialBuyInMove(myPlayerId, amount, playerIdToTokensInPot));
+    container.sendMakeMove(pokerLogic.getInitialBuyInMove(
+        myPlayerId, playerIdList, amount, playerIdToTokensInPot));
   }
   
   /**

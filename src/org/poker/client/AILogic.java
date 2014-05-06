@@ -6,7 +6,7 @@ import org.game_api.GameApi.Operation;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.google.gwt.thirdparty.guava.common.collect.Lists;
+import com.google.common.collect.Lists;
 
 public class AILogic extends AbstractPokerLogicBase {
   
