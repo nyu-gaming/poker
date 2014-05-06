@@ -120,7 +120,12 @@ public class PokerPresenter {
       if (myPlayer.isPresent()) {
         // If current player has not done the buy-in
         if (!buyInSuccessfullyDone()) {
-          view.doBuyIn();
+          if(updateUI.isAiPlayer()){
+            buyInDone(5000);
+          }else {
+            view.doBuyIn();
+          }
+          
         }
         // Check if everyone has done a buy-In and current player is the dealer
         else if (canGameStart() && isDealer()) {

@@ -42,12 +42,12 @@ public class AIHelper {
     board.add(Optional.fromNullable(n));
     
     AIHelper ai = new AIHelper();
-    System.out.println(ai.monteCarloPokerSimulation(board,holeCards, opponentHoleCards));
+    System.out.println(ai.getWinningChance(board,holeCards, opponentHoleCards));
     
   }
    
   
-  public double monteCarloPokerSimulation(List<Optional<Card>> board, List<Optional<Card>> holeCards, List<Optional<Card>> opponentHoleCards  ) {
+  public double getWinningChance(List<Optional<Card>> board, List<Optional<Card>> holeCards, List<Optional<Card>> opponentHoleCards  ) {
     // Remove present cards from the random card select pool
     
     return simulate(board, holeCards, opponentHoleCards);

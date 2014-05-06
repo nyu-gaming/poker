@@ -33,10 +33,11 @@ public class AILogic extends AbstractPokerLogicBase {
     int currentBet = playerBets.get(aiIndex);
     int amountToCall = requiredBet - currentBet;
     
-    List<Card> aiHand = getCards(state.getHoleCards().get(aiIndex), state.getCards());
-    List<Card> opponentHand = getCards(state.getHoleCards().get(opponentIndex), state.getCards());
-    List<Card> board = getCards(state.getBoard(), state.getCards());
-    double winChance = 0; // = AIHelper.getWinningChance(aiHand, opponentHand, board); 
+    List<Optional<Card>> aiHand = getCards(state.getHoleCards().get(aiIndex), state.getCards());
+    List<Optional<Card>> opponentHand = getCards(state.getHoleCards().get(opponentIndex), state.getCards());
+    List<Optional<Card>> board = getCards(state.getBoard(), state.getCards());
+    AIHelper ai = new AIHelper();
+    double winChance = ai.getWinningChance(board, aiHand, opponentHand ); 
     
     if (amountToCall == 0) {
       // Check or Bet?
@@ -119,10 +120,10 @@ public class AILogic extends AbstractPokerLogicBase {
     }
   }
   
-  private List<Card> getCards(List<Integer> cardIndices, ImmutableList<Optional<Card>> deck) {
-    List<Card> cards = Lists.newArrayList();
+  private List<Optional<Card>> getCards(List<Integer> cardIndices, ImmutableList<Optional<Card>> deck) {
+    List<Optional<Card>> cards = Lists.newArrayList();
     for (Integer cardIndex : cardIndices) {
-      cards.add(deck.get(cardIndex).get());
+      cards.add(Optional.of(deck.get(cardIndex).get()));
     }
     return cards;
   }
