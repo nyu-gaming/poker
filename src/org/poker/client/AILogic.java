@@ -15,7 +15,7 @@ public class AILogic extends AbstractPokerLogicBase {
   
   public List<Operation> decideMove(PokerState state, PokerState lastState, List<String> playerIds) {
     
-    // lastState cannot be null because AI will not have first move
+     // lastState cannot be null because AI will not have first move
     
     PokerMove previousMove = state.getPreviousMove();
     int aiIndex = state.getWhoseMove().ordinal();
