@@ -46,7 +46,7 @@ public class PokerLogic extends AbstractPokerLogicBase {
     // However, we do need to check the first non-buyIn move is done by P0 (and then in the
     // first MakeMove we'll send SetTurn which will guarantee the correct player send MakeMove).
     if (verifyMove.getLastState().isEmpty()) {
-      if(!(lastMove.get(0) instanceof AttemptChangeTokens)) {
+      if(!(lastMove.get(1) instanceof AttemptChangeTokens)) {
         check(verifyMove.getLastMovePlayerId().equals(verifyMove.getPlayerIds().get(0)), "Wrong player");
       }
     }
