@@ -67,10 +67,10 @@ public class PokerLogic extends AbstractPokerLogicBase {
     
     // Handle initial move (empty last state)
     if(lastApiState.isEmpty()) {
-      if(lastMove.get(0) instanceof AttemptChangeTokens) {
+      if(lastMove.get(1) instanceof AttemptChangeTokens) {
         // Player's move was to "buy-in"
         int buyInAmount = playerIdToNumberOfTokensInPot.get(lastMovePlayerId);
-        return getInitialBuyInMove(lastMovePlayerId,playerIds, buyInAmount, playerIdToNumberOfTokensInPot);
+        return getInitialBuyInMove(lastMovePlayerId, playerIds, buyInAmount, playerIdToNumberOfTokensInPot);
       }
       else {
         // Initial move performed by the dealer
