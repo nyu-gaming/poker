@@ -13,7 +13,14 @@ public class BestHandFinder {
   private List<Card> hand;
   private PokerHand bestHand;
   
+  public BestHandFinder() {
+  }
+  
   public BestHandFinder(List<Card> board, List<Card> holeCards) {
+    reset(board, holeCards);
+  }
+  
+  public void reset(List<Card> board, List<Card> holeCards) {
     if(board == null || board.size() != 5) {
       throw new IllegalArgumentException("board list invalid. Expected: 5; Got: " +
           (board == null? null : board.size()));
@@ -23,9 +30,11 @@ public class BestHandFinder {
           (holeCards == null? null : holeCards.size()));
     }
     
-    cards = Lists.newArrayList();
+    if (cards == null) cards = Lists.newArrayList();
+    else cards.clear();
     cards.addAll(board);
     cards.addAll(holeCards);
+    bestHand = null;
   }
   
   public PokerHand find() {

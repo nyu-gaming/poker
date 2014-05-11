@@ -15,8 +15,9 @@ import com.google.common.base.Optional;
 
 public class AIHelper {
   
-  static final int trials = 1000;
-  
+  static final int trials = 200;
+  private final BestHandFinder bestHandFinder = new BestHandFinder();
+ 
   private static RandomCardProvider cardProvider = new AIHelper.RandomCardProvider();
   
   public static void main(String args[]) {
@@ -55,7 +56,7 @@ public class AIHelper {
   
   public double simulate(List<Optional<Card>> board, List<Optional<Card>> holeCards, List<Optional<Card>> opponentHoleCards) {
     int winOrTies = 0;
-    BestHandFinder aIfinder, opponentFinder;
+    //BestHandFinder aIfinder, opponentFinder;
     PokerHand aiHand, opponentHand;
     List<Optional<Card>> boardCopy;
     List<Optional<Card>> holeCardsCopy;
@@ -71,10 +72,10 @@ public class AIHelper {
       opponentHoleCardsCopy = copy(opponentHoleCards);
       assignCards(boardCopy, holeCardsCopy, opponentHoleCardsCopy);
       
-      aIfinder = new BestHandFinder(fromOptionalToList(boardCopy), fromOptionalToList(holeCardsCopy));
-      opponentFinder = new BestHandFinder(fromOptionalToList(boardCopy), fromOptionalToList(opponentHoleCardsCopy));
-      aiHand = aIfinder.find();
-      opponentHand = opponentFinder.find();
+      bestHandFinder.reset(fromOptionalToList(boardCopy), fromOptionalToList(holeCardsCopy));
+      aiHand = bestHandFinder.find();
+      bestHandFinder.reset(fromOptionalToList(boardCopy), fromOptionalToList(opponentHoleCardsCopy));
+      opponentHand = bestHandFinder.find();
       if (aiHand.compareRanking(opponentHand) >= 0 ) {
         winOrTies ++;
       }
