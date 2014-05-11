@@ -34,7 +34,7 @@ public class PokerLogicHelper extends AbstractPokerLogicBase {
    * @param gameApiState
    * @return
    */
-  PokerState gameApiStateToPokerState(Map<String, Object> gameApiState) {
+  public PokerState gameApiStateToPokerState(Map<String, Object> gameApiState) {
 
     PokerMove previousMove = PokerMove.valueOf((String)gameApiState.get(PREVIOUS_MOVE));
     boolean previousMoveAllIn = (Boolean)gameApiState.get(PREVIOUS_MOVE_ALL_IN);

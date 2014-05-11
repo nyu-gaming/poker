@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1.0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Poker</title>
     <script type="text/javascript" language="javascript" src="poker_game/poker_game.nocache.js"></script>
     <style>
@@ -11,18 +11,21 @@
 		    background-repeat: no-repeat;
 	      background-position: center center;
 	      background-size: 100%;
-	      width: 100%;
-	      padding-bottom: 54%;
-	      position: absolute;
+	      width: 650px;
+        height: 334px;
+	      /*padding-bottom: 54%;*/
+	      /*position: absolute;*/
       }
       .btnPanel {
-      	position: absolute;
-      	margin-top: 54%
+        height: 52px;
+      	/*position: absolute;*/
+      	/*margin-top: 100%*/
       }
       .pot {
       	position: absolute;
-      	margin-top: 10%;
-      	margin-left: 27%;
+      	margin-top: 70px;
+      	margin-left: 185px;
+        width: 275px;
       }
       .potInfoPanel {
         /* position: relative;
@@ -67,26 +70,30 @@
       
       .playerSeat1 {
       	position: absolute;
-      	margin-left: 82%;
-      	margin-top: 10%;
+      	margin-left: 520px;
+      	margin-top: 50px;
+        width: 100px;
       }
       
       .playerSeat2 {
       	position: absolute;
-      	margin-left: 72%;
-      	margin-top: 32%;
+      	margin-left: 470px;
+      	margin-top: 190px;
+        width: 100px;
       }
       
       .playerSeat3 {
       	position: absolute;
-      	margin-left: 15%;
-      	margin-top: 32%;
+      	margin-left: 110px;
+      	margin-top: 190px;
+        width: 100px;
       }
       
       .playerSeat4 {
       	position: absolute;
-      	margin-left: 6%;
-      	margin-top: 10%;
+      	margin-left: 60px;
+      	margin-top: 50px;
+        width: 100px;
       }
       
       .overlay {
@@ -101,7 +108,7 @@
       }
       
       #warning-message { display: none; }
-    @media only screen and (orientation:portrait){
+    /*@media only screen and (orientation:portrait){
         #mainDiv { display:none; }
         .buyin_popup { display:none; }
         #warning-message { display:block; 
@@ -109,23 +116,46 @@
     	}
     @media only screen and (orientation:landscape){
         #warning-message { display:none; position:absolute; top:45%; left:40%}
-    }
+    }*/
       
     </style>
 
-    <!--script>
-    	$(document).ready(function () {
-  				function reorient(e) {
-    			var portrait = (window.orientation % 180 == 0);
-    			$("body > div").css("-webkit-transform", !portrait ? "rotate(-90deg)" : "");
-  			}
-  		window.onorientationchange = reorient;
-  		window.setTimeout(reorient, 0);
-		});
-    </script-->
+    <script>
+      function scaleBody() {
+        var myGameWidth = 680;
+        var myGameHeight = 420;
+        var scaleX = window.innerWidth / myGameWidth;
+        var scaleY = window.innerHeight / myGameHeight;
+        var scale = Math.min(scaleX, scaleY);
+        /*alert("Game Width: " + myGameWidth + 
+          "\nWindow Width: " + window.innerWidth + 
+          "\nScale X: " + scaleX + 
+          "\nScale Y: " + scaleY + 
+          "\nScale: " + scale);*/
+        var transformString = "scale(" + scale + "," + scale + ")";
+        
+        document.body.style.transform = transformString;
+        document.body.style['-o-transform'] = transformString;
+        document.body.style['-webkit-transform'] = transformString;
+        document.body.style['-moz-transform'] = transformString;
+        document.body.style['-ms-transform'] = transformString;
+        var transformOriginString = "0 0 0";
+        document.body.style['transform-origin'] = transformOriginString;
+        document.body.style['-o-transform-origin'] = transformOriginString;
+        document.body.style['-webkit-transform-origin'] = transformOriginString;
+        document.body.style['-moz-transform-origin'] = transformOriginString;
+        document.body.style['-ms-transform-origin'] = transformOriginString;
+        
+      }
+      window.onload = scaleBody;
+      window.onresize = scaleBody;
+      window.onorientationchange = scaleBody;
+      document.addEventListener("orientationchange", scaleBody);
+      //scaleBody();
+    </script>
   </head>
   <body>
-    <div id="mainDiv" width="400" height="400" ></div>
+    <div id="mainDiv" ></div>
     <div id="warning-message">This website is only viewable in landscape mode</div>
   </body>
 </html>

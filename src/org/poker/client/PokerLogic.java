@@ -367,7 +367,7 @@ public class PokerLogic extends AbstractPokerLogicBase {
     }
     else {
       for(Pot pot : pots) {
-        int existingBet = lastState.getPlayerBets().get(playerIndex);
+        int existingBet = pot.getPlayerBets().get(playerIndex);
         List<String> playersInPot = helper.getApiPlayerList(pot.getPlayersInPot());
         List<String> newPlayersInPot = addToList(playersInPot, lastState.getWhoseMove().name());
         List<Integer> playerPotBets = pot.getPlayerBets();
@@ -788,9 +788,12 @@ public class PokerLogic extends AbstractPokerLogicBase {
       return true;
     }
     
-    // Check if player left has matched the current bet (this can't be current player).
-    if (playersLeft == 1 && lastState.getPlayerBets().get(lastPlayer.ordinal()) < requiredBet) {
-      // Last player left is still to act
+    if (playersLeft == 1 && lastPlayer == lastState.getWhoseMove()) {
+      // Only current player left
+      return true;
+    }
+    else if (playersLeft == 1 && lastState.getPlayerBets().get(lastPlayer.ordinal()) < requiredBet) {
+      // Player left (not current player) hasn't matched the current bet
       return false;
     }
     return true;
@@ -1036,7 +1039,8 @@ public class PokerLogic extends AbstractPokerLogicBase {
     }
     else {
       for(Pot pot : pots) {
-        int existingBet = lastState.getPlayerBets().get(playerIndex);
+        int existingBet = pot.getPlayerBets().get(playerIndex);
+        //int existingBet = lastState.getPlayerBets().get(playerIndex);
         List<String> playersInPot = helper.getApiPlayerList(pot.getPlayersInPot());
         List<String> newPlayersInPot = addToList(playersInPot, lastState.getWhoseMove().name());
         List<Integer> newPlayerPotBets = createNewList(numOfPlayers, 0);
