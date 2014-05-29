@@ -349,8 +349,8 @@ public class PokerGraphics extends Composite implements PokerPresenter.View {
       buyInPopup = new PopupEnterValue(pokerMessages.info_enterBuyInAmount(), new PopupEnterValue.ValueEntered() {
         @Override
         public void setValue(int value) {
-          presenter.buyInDone(value);
           buyInPopup = null;
+          presenter.buyInDone(value);
         }
       });
       buyInPopup.center();

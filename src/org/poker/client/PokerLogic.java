@@ -185,6 +185,7 @@ public class PokerLogic extends AbstractPokerLogicBase {
     }
     
     return ImmutableList.<Operation>of(
+        new SetTurn(playerIds.get(lastState.getWhoseMove().ordinal())),
         new AttemptChangeTokens(
             playerIdToTokensBuilder.build(),
             playerIdToPotTokensBuilder.build()),
