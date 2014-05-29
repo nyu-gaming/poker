@@ -71,11 +71,9 @@ public final class GameApi {
     }
 
     public static native void postMessageToParent(String message) /*-{
-	    $wnd.parent.postMessage(JSON.parse(message), "*");
-	  }-*/;
-    
-    public static native void alert(String message) /*-{
-      $wnd.alert(message);
+      var msg = JSON.parse(message);
+      console.log('Message to container', msg);
+      $wnd.platform.gotMessage(msg);
     }-*/;
 
     public void eventListner(String message) {
@@ -89,10 +87,16 @@ public final class GameApi {
 
     private native void injectEventListener(ContainerConnector containerConnector) /*-{
       function postMessageListener(e) {
-        var str = JSON.stringify(e.data);
+        passMessage(e.data);
+      }
+      function passMessage(message) {
+        console.log('Message from container', message);
+        var str = JSON.stringify(message);
         var c = containerConnector;
         c.@org.game_api.GameApi.ContainerConnector::eventListner(Ljava/lang/String;)(str);
       }
+      $wnd.passMessage = passMessage;
+      console.log('Setting passMessage');
       $wnd.addEventListener("message", postMessageListener, false);
     }-*/;
 
@@ -1117,16 +1121,6 @@ public final class GameApi {
         } else {
           throw new IllegalStateException("Invalid JSONValue encountered");
         }
-      }
-      return map;
-    }
-
-    @Deprecated
-    public static Map<Integer, Integer> getIntegerMapFromJsonObject(JSONObject jsonObj) {
-      Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-      for (String key : jsonObj.keySet()) {
-        JSONValue jsonVal = jsonObj.get(key);
-        map.put(Integer.parseInt(key), new Integer((int) ((JSONNumber) jsonVal).doubleValue()));
       }
       return map;
     }
